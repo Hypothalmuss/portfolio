@@ -1,213 +1,181 @@
-/* ══════════════════════════════════════════════════════
-   visitor.js
-   — Greeting toast (localStorage visit count)
-   — Global visit counter (CountAPI, free & no signup)
-══════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════
+   visitor.js  —  Greeting toast + visitor counter
+   
+   HOW IT WORKS:
+   • Greeting toast  → localStorage (works 100%, no network)
+   • Global counter  → JSONBin.io   (free, CORS-friendly)
+   
+   SETUP (one-time, 2 minutes):
+   1. Go to https://jsonbin.io  →  sign up free
+   2. Create a new Bin with content:  { "count": 0 }
+   3. Copy the Bin ID and paste it as BIN_ID below
+   4. Copy your API key and paste it as BIN_API_KEY below
+   That's it — the counter will increment on every real visit.
+══════════════════════════════════════════════════════════ */
 
 (function () {
+  'use strict';
 
-  /* ── CONFIG ────────────────────────────────────────
-     CountAPI namespace + key — unique to your portfolio.
-     Format: api.counterapi.dev/v1/<key>/up
-     First hit auto-creates the counter.
-     Change COUNT_KEY only if you want to reset the count to 0.
-  ─────────────────────────────────────────────────── */
-  // Using counterapi.dev — free, no signup, CountAPI replacement
-  // Your unique key — change ONLY if you want to reset the counter to 0
-  const COUNT_KEY = 'nadimtouil-portfolio-v1';
+  /* ─── JSONBin config ────────────────────────────────────
+     Replace these two values after creating your free bin.
+     Instructions above. Leave as-is to skip the counter.
+  ──────────────────────────────────────────────────────── */
+  const BIN_ID      = '69cb8f3b856a682189e5f358';      // e.g. '6650abc123def456789'
+  const BIN_API_KEY = '$2a$10$D3FbMKIQI8FXpsHILgfHDe66J0FUFCkXEFJFJyAIiLOUIH3i86uk.';      // e.g. '$2a$10$...'
+  const COUNTER_ENABLED = BIN_ID !== 'YOUR_BIN_ID_HERE';
 
-  /* ── GREETING DEFINITIONS ───────────────────────────
-     visits = how many times THIS browser has been here.
-     Each entry: { emoji, headline, sub }
-  ─────────────────────────────────────────────────── */
+  /* ─── Greeting messages ─────────────────────────────────
+     Indexed by (localVisits - 1). Last entry is the fallback.
+  ──────────────────────────────────────────────────────── */
   const GREETINGS = [
-    // 1st visit
-    {
-      emoji: '👋',
-      headline: 'Welcome!',
-      sub: 'Thanks for stopping by. Feel free to look around.',
-    },
-    // 2nd visit
-    {
-      emoji: '🤖',
-      headline: 'Welcome back!',
-      sub: 'Good to see you again. Something catch your eye?',
-    },
-    // 3rd visit
-    {
-      emoji: '😄',
-      headline: 'You again!',
-      sub: 'Third time\'s the charm. Are you recruiting? I hope so.',
-    },
-    // 4th visit
-    {
-      emoji: '🏠',
-      headline: 'Welcome home.',
-      sub: 'You visit more than I do. Grab a coffee, stay a while.',
-    },
-    // 5th visit
-    {
-      emoji: '🕵️',
-      headline: 'Still here?',
-      sub: 'Five visits. I respect the dedication. Let\'s just talk already.',
-    },
-    // 6th visit
-    {
-      emoji: '🔩',
-      headline: 'You\'re basically a robot yourself.',
-      sub: 'Consistent. Precise. Unstoppable. Just like my code.',
-    },
-    // 7th visit
-    {
-      emoji: '🚀',
-      headline: 'Visit #7. Legend.',
-      sub: 'At this point just send me an email. mohamednadimtouil@gmail.com',
-    },
-    // 8th+ fallback
-    {
-      emoji: '🤝',
-      headline: 'We\'re basically colleagues now.',
-      sub: 'Hire me already — you clearly like what you see.',
-    },
+    { emoji: '👋', head: 'Welcome!',                    sub: 'Thanks for stopping by. Feel free to look around.' },
+    { emoji: '🤖', head: 'Welcome back!',               sub: 'Good to see you again. Something catch your eye?' },
+    { emoji: '😄', head: 'You again!',                  sub: "Third time's the charm. Are you recruiting? I hope so." },
+    { emoji: '🏠', head: 'Welcome home.',               sub: 'You visit more than I do. Grab a coffee, stay a while.' },
+    { emoji: '🕵️', head: 'Still here?',                 sub: "Five visits. I respect the dedication. Let's just talk already." },
+    { emoji: '🔩', head: "You're basically a robot.",   sub: 'Consistent. Precise. Unstoppable. Just like my code.' },
+    { emoji: '🚀', head: 'Visit #7. Legend.',           sub: 'At this point just send me an email. You know where to find it.' },
+    { emoji: '🤝', head: "We're basically colleagues.", sub: 'Hire me already — you clearly like what you see.' },
   ];
 
-  /* ── TOAST DISMISS DURATION (ms) ───────────────────
-     Toast auto-dismisses after this time.
-  ─────────────────────────────────────────────────── */
-  const TOAST_DURATION = 6500;
+  const TOAST_MS = 7000; // auto-dismiss after 7s
 
-  /* ══════════════════════════════════════════════════
-     1. LOCAL VISIT COUNT
-     Stored in localStorage so it's per-device/browser.
-  ══════════════════════════════════════════════════ */
-  let localVisits = 0;
+  /* ════════════════════════════════════════════════════════
+     1. LOCAL VISIT COUNT  (localStorage — always works)
+  ════════════════════════════════════════════════════════ */
+  let visits = 1;
   try {
-    localVisits = parseInt(localStorage.getItem('nt_visits') || '0', 10);
-    localVisits += 1;
-    localStorage.setItem('nt_visits', String(localVisits));
-  } catch (e) {
-    // localStorage blocked (private browsing etc.) — default to 1
-    localVisits = 1;
-  }
+    visits = parseInt(localStorage.getItem('nt_visits') || '0', 10) + 1;
+    localStorage.setItem('nt_visits', String(visits));
+  } catch (_) { /* private mode — default 1 */ }
 
-  /* ══════════════════════════════════════════════════
-     2. PICK GREETING
-  ══════════════════════════════════════════════════ */
-  const idx      = Math.min(localVisits - 1, GREETINGS.length - 1);
-  const greeting = GREETINGS[idx];
-
-  /* ══════════════════════════════════════════════════
-     3. SHOW TOAST — delayed slightly so page loads first
-  ══════════════════════════════════════════════════ */
+  /* ════════════════════════════════════════════════════════
+     2. GREETING TOAST
+  ════════════════════════════════════════════════════════ */
   function showToast() {
-    const toast    = document.getElementById('visitor-toast');
-    const emojiEl  = document.getElementById('toast-emoji');
-    const headEl   = document.getElementById('toast-headline');
-    const subEl    = document.getElementById('toast-sub');
+    const toast = document.getElementById('visitor-toast');
+    if (!toast) {
+      console.warn('[visitor.js] #visitor-toast not found in DOM');
+      return;
+    }
+
+    const g = GREETINGS[Math.min(visits - 1, GREETINGS.length - 1)];
+
+    const emojiEl = document.getElementById('toast-emoji');
+    const headEl  = document.getElementById('toast-headline');
+    const subEl   = document.getElementById('toast-sub');
     const closeBtn = document.getElementById('toast-close');
-    const progress = toast ? toast.querySelector('.toast-progress') : null;
+    const bar     = toast.querySelector('.toast-progress');
 
-    if (!toast || !emojiEl || !headEl || !subEl) return;
+    if (emojiEl) emojiEl.textContent = g.emoji;
+    if (headEl)  headEl.textContent  = g.head;
+    if (subEl)   subEl.textContent   = g.sub;
 
-    emojiEl.textContent = greeting.emoji;
-    headEl.textContent  = greeting.headline;
-    subEl.textContent   = greeting.sub;
-
-    // Show
+    /* show */
+    toast.style.display = 'block';
     requestAnimationFrame(() => {
-      toast.classList.add('toast-show');
+      requestAnimationFrame(() => {
+        toast.classList.add('toast-show');
+      });
     });
 
-    // Animate progress bar drain
-    if (progress) {
-      progress.style.transition = `transform ${TOAST_DURATION}ms linear`;
+    /* progress bar drain */
+    if (bar) {
+      bar.style.transition = 'none';
+      bar.style.transform  = 'scaleX(1)';
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          progress.style.transform = 'scaleX(0)';
+          bar.style.transition = `transform ${TOAST_MS}ms linear`;
+          bar.style.transform  = 'scaleX(0)';
         });
       });
     }
 
-    // Auto-dismiss
-    let dismissTimer = setTimeout(dismissToast, TOAST_DURATION);
+    /* auto-dismiss */
+    let timer = setTimeout(dismiss, TOAST_MS);
 
-    // Manual close
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
-        clearTimeout(dismissTimer);
-        dismissToast();
-      });
-    }
+    /* manual close */
+    if (closeBtn) closeBtn.addEventListener('click', () => { clearTimeout(timer); dismiss(); });
 
-    // Pause drain on hover
-    if (progress) {
-      toast.addEventListener('mouseenter', () => {
-        progress.style.transition = 'none';
-        clearTimeout(dismissTimer);
-      });
-      toast.addEventListener('mouseleave', () => {
-        // Resume with remaining time (simplified: restart full timer)
-        progress.style.transition = `transform ${TOAST_DURATION * 0.4}ms linear`;
-        progress.style.transform  = 'scaleX(0)';
-        dismissTimer = setTimeout(dismissToast, TOAST_DURATION * 0.4);
-      });
-    }
+    /* pause on hover */
+    toast.addEventListener('mouseenter', () => {
+      clearTimeout(timer);
+      if (bar) bar.style.transition = 'none';
+    });
+    toast.addEventListener('mouseleave', () => {
+      const remaining = TOAST_MS * 0.35;
+      if (bar) {
+        bar.style.transition = `transform ${remaining}ms linear`;
+        bar.style.transform  = 'scaleX(0)';
+      }
+      timer = setTimeout(dismiss, remaining);
+    });
   }
 
-  function dismissToast() {
+  function dismiss() {
     const toast = document.getElementById('visitor-toast');
     if (!toast) return;
     toast.classList.remove('toast-show');
     toast.classList.add('toast-hide');
+    setTimeout(() => { toast.style.display = 'none'; }, 500);
   }
 
-  /* ══════════════════════════════════════════════════
-     4. GLOBAL VISIT COUNTER via counterapi.dev
-     Free, no account needed, CountAPI replacement.
-     Falls back gracefully if offline / API down.
-  ══════════════════════════════════════════════════ */
-  function fetchAndDisplayCount() {
-    const url = `https://api.counterapi.dev/v1/${COUNT_KEY}/up`;
+  /* ════════════════════════════════════════════════════════
+     3. GLOBAL COUNTER  (JSONBin.io — CORS-safe, free)
+     
+     Flow: GET current count → increment → PUT back → display
+  ════════════════════════════════════════════════════════ */
+  function setCountUI(n) {
+    const fmt = typeof n === 'number' ? n.toLocaleString() : n;
+    const h = document.getElementById('hero-visitor-count');
+    const f = document.getElementById('footer-visitor-count');
+    if (h) { h.textContent = fmt; h.classList.add('count-loaded'); }
+    if (f) { f.textContent = fmt; f.classList.add('count-loaded'); }
+  }
 
-    fetch(url, { cache: 'no-store' })
-      .then(r => r.json())
-      .then(data => {
-        const count = (data && (data.count ?? data.value)) ? (data.count ?? data.value) : null;
-        if (!count) return;
+  async function runCounter() {
+    if (!COUNTER_ENABLED) {
+      setCountUI('—');
+      return;
+    }
 
-        const formatted = count.toLocaleString();
+    const headers = {
+      'X-Master-Key': BIN_API_KEY,
+      'Content-Type': 'application/json',
+      'X-Bin-Versioning': 'false',   // don't keep history — keeps it free
+    };
+    const base = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-        // Hero stat
-        const heroEl = document.getElementById('hero-visitor-count');
-        if (heroEl) {
-          heroEl.textContent = formatted;
-          heroEl.classList.add('count-loaded');
-        }
+    try {
+      /* GET */
+      const getRes = await fetch(base + '/latest', { headers });
+      if (!getRes.ok) throw new Error('GET failed');
+      const getData = await getRes.json();
+      const current = (getData.record && getData.record.count) ? getData.record.count : 0;
+      const next    = current + 1;
 
-        // Footer stat
-        const footerEl = document.getElementById('footer-visitor-count');
-        if (footerEl) {
-          footerEl.textContent = formatted;
-          footerEl.classList.add('count-loaded');
-        }
-      })
-      .catch(() => {
-        // API unreachable — show nothing rather than error
-        const heroEl   = document.getElementById('hero-visitor-count');
-        const footerEl = document.getElementById('footer-visitor-count');
-        if (heroEl)   heroEl.textContent   = '…';
-        if (footerEl) footerEl.textContent = '…';
+      /* PUT */
+      await fetch(base, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ count: next }),
       });
+
+      setCountUI(next);
+    } catch (err) {
+      console.warn('[visitor.js] Counter error:', err.message);
+      setCountUI('—');
+    }
   }
 
-  /* ══════════════════════════════════════════════════
-     5. INIT — wait for DOM then fire both
-  ══════════════════════════════════════════════════ */
+  /* ════════════════════════════════════════════════════════
+     4. INIT
+  ════════════════════════════════════════════════════════ */
   function init() {
-    // Slight delay so hero entrance animation finishes first
-    setTimeout(showToast,          1400);
-    // Counter can run immediately
-    fetchAndDisplayCount();
+    // Toast fires after page entrance animation (~1.4s)
+    setTimeout(showToast, 1400);
+    // Counter runs in background
+    runCounter();
   }
 
   if (document.readyState === 'loading') {

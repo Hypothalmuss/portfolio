@@ -8,13 +8,13 @@
 
   /* ── CONFIG ────────────────────────────────────────
      CountAPI namespace + key — unique to your portfolio.
-     Format: countapi.xyz/hit/<namespace>/<key>
-     You can pick any namespace/key combo — first hit
-     auto-creates the counter. Keep it secret-ish so
-     random people don't spam it.
+     Format: api.counterapi.dev/v1/<key>/up
+     First hit auto-creates the counter.
+     Change COUNT_KEY only if you want to reset the count to 0.
   ─────────────────────────────────────────────────── */
-  const COUNT_NAMESPACE = 'nadimtouil-portfolio';
-  const COUNT_KEY       = 'visitors-v1';
+  // Using counterapi.dev — free, no signup, CountAPI replacement
+  // Your unique key — change ONLY if you want to reset the counter to 0
+  const COUNT_KEY = 'nadimtouil-portfolio-v1';
 
   /* ── GREETING DEFINITIONS ───────────────────────────
      visits = how many times THIS browser has been here.
@@ -162,18 +162,17 @@
   }
 
   /* ══════════════════════════════════════════════════
-     4. GLOBAL VISIT COUNTER via CountAPI
-     Docs: https://countapi.xyz
-     Free, no account needed.
+     4. GLOBAL VISIT COUNTER via counterapi.dev
+     Free, no account needed, CountAPI replacement.
      Falls back gracefully if offline / API down.
   ══════════════════════════════════════════════════ */
   function fetchAndDisplayCount() {
-    const url = `https://api.countapi.xyz/hit/${COUNT_NAMESPACE}/${COUNT_KEY}`;
+    const url = `https://api.counterapi.dev/v1/${COUNT_KEY}/up`;
 
     fetch(url, { cache: 'no-store' })
       .then(r => r.json())
       .then(data => {
-        const count = data && data.value ? data.value : null;
+        const count = (data && (data.count ?? data.value)) ? (data.count ?? data.value) : null;
         if (!count) return;
 
         const formatted = count.toLocaleString();

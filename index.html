@@ -57,11 +57,16 @@
           <div class="hstat"><span class="hstat-n">6+</span><span class="hstat-l">Deployed<br/>Autonomy Systems</span></div>
           <div class="hstat-sep"></div>
           <div class="hstat"><span class="hstat-n">3</span><span class="hstat-l">Robot<br/>Platforms</span></div>
+          <div class="hstat-sep"></div>
+          <div class="hstat">
+            <span class="hstat-n" id="hero-visitor-count">—</span>
+            <span class="hstat-l">Portfolio<br/>Visitors</span>
+          </div>
         </div>
 
         <div class="hero-actions">
           <a href="#projects" class="btn-primary">View My Work</a>
-          <a href="mailto:mohamednadimtouil@gmail.com" class="btn-secondary">Get in Touch</a>
+          <a href="/cdn-cgi/l/email-protection#402d2f28212d25242e2124292d342f35292c00272d21292c6e232f2d" class="btn-secondary">Get in Touch</a>
         </div>
 
         <div class="hero-socials">
@@ -262,7 +267,7 @@
         <article class="pcard reveal">
           <div class="pcard-media">
             <video controls preload="metadata" playsinline>
-              <source src="assets/videos/asv-demoo.mp4" type="video/mp4" />
+              <source src="assets/videos/asv-demo.mp4" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
             <div class="pcard-tag mono">AUTONOMOUS VESSEL · ROS 2 · OPEN WATER</div>
@@ -336,11 +341,11 @@
           </div>
         </div>
         <div class="contact-right">
-          <a href="mailto:mohamednadimtouil@gmail.com" class="ccard">
+          <a href="/cdn-cgi/l/email-protection#036e6c6b626e66676d62676a6e776c766a6f43646e626a6f2d606c6e" class="ccard">
             <div class="ccard-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </div>
-            <div><p class="cc-lbl mono">Email</p><p class="cc-val">mohamednadimtouil@gmail.com</p></div>
+            <div><p class="cc-lbl mono">Email</p><p class="cc-val"><span class="__cf_email__" data-cfemail="80edefe8e1ede5e4eee1e4e9edf4eff5e9ecc0e7ede1e9ecaee3efed">[email&#160;protected]</span></p></div>
             <span class="cc-arr">→</span>
           </a>
           <a href="https://linkedin.com/in/MedNadimTouil" target="_blank" rel="noopener" class="ccard">
@@ -377,9 +382,27 @@
         <a href="https://github.com/hypothalmuss" target="_blank" rel="noopener">GitHub</a>
         <a href="https://linkedin.com/in/MedNadimTouil" target="_blank" rel="noopener">LinkedIn</a>
       </div>
+      <div class="footer-visitor">
+        <span class="footer-visitor-dot"></span>
+        <span id="footer-visitor-count">—</span> visitors
+      </div>
     </div>
   </footer>
 
+  <!-- ═══ GREETING TOAST ═══ -->
+  <div id="visitor-toast" role="status" aria-live="polite">
+    <div class="toast-inner">
+      <span id="toast-emoji" class="toast-emoji"></span>
+      <div class="toast-text">
+        <p id="toast-headline" class="toast-headline"></p>
+        <p id="toast-sub" class="toast-sub"></p>
+      </div>
+      <button id="toast-close" class="toast-close" aria-label="Close">✕</button>
+    </div>
+    <div class="toast-progress"></div>
+  </div>
+
   <script src="script.js"></script>
+  <script src="visitor.js"></script>
 </body>
 </html>

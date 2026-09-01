@@ -35,14 +35,9 @@ The counter is real and global, backed by a Cloudflare Worker with a KV store.
 **No API key lives in this repository** — the browser can only read a number,
 and the increment happens server-side, deduped to one count per visitor per day.
 
-It is not live until you deploy the worker:
-
-1. Follow [`worker/README.md`](worker/README.md) — about 3 minutes.
-2. Paste the resulting Worker URL into `COUNTER_API` at the top of
-   [`visitor.js`](visitor.js).
-3. Commit and push.
-
-Until then the counter shows `—` and everything else works normally.
+**The counter is live.** It runs on Cloudflare's edge network — nothing needs to
+be running on your machine. See [`worker/README.md`](worker/README.md) to
+redeploy after a change.
 
 > **Note:** a previous version of this site hardcoded a JSONBin *master key* in
 > `Visitor.js`. That key is public in this repository's git history and should be

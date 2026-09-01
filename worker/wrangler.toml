@@ -6,4 +6,4 @@ compatibility_date = "2026-01-01"
 # Paste the returned id below, then:  npx wrangler deploy
 [[kv_namespaces]]
 binding = "COUNTER"
-id = "PASTE_YOUR_KV_NAMESPACE_ID_HERE"
+id = "3050bdd3dc564947a77b367ea508a0e0"

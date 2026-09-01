@@ -16,7 +16,7 @@
      After `wrangler deploy`, replace this with your Worker URL, e.g.
      'https://portfolio-counter.nadim.workers.dev'
   ──────────────────────────────────────────────────────── */
-  const COUNTER_API = '';
+  const COUNTER_API = 'https://portfolio-counter.nadimtouil.workers.dev';
 
   const GREETINGS = [
     { emoji: '👋', head: 'Welcome!',                    sub: 'Thanks for stopping by. Feel free to look around.' },

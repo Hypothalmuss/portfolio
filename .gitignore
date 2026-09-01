@@ -1,0 +1,8 @@
+# Wrangler local state — caches the Cloudflare account id and email
+worker/.wrangler/
+node_modules/
+
+# OS cruft
+Thumbs.db
+desktop.ini
+.DS_Store

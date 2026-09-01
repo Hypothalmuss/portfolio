@@ -8,23 +8,33 @@ Cloudflare's edge, and each visitor is counted at most once per 24 hours
 (deduped by a salted SHA-256 of IP + user-agent + date — no raw IP is stored,
 and the entry self-expires).
 
-## Deploy — about 3 minutes
+## Status — deployed
+
+Live at **https://portfolio-counter.nadimtouil.workers.dev**, bound to the KV
+namespace `COUNTER` (`3050bdd3dc564947a77b367ea508a0e0`). The URL is already set
+as `COUNTER_API` in [`../visitor.js`](../visitor.js).
+
+## Redeploying after a change
 
 ```bash
 cd worker
-npm install -g wrangler       # once
-wrangler login                # opens the browser
-
-wrangler kv namespace create COUNTER
-# → copy the printed id into wrangler.toml, replacing PASTE_YOUR_KV_NAMESPACE_ID_HERE
-
 wrangler deploy
 ```
 
-`wrangler deploy` prints your Worker URL, e.g.
-`https://portfolio-counter.<your-subdomain>.workers.dev`
+If `wrangler login` has expired, run it again first. No other setup is needed —
+`wrangler.toml` already carries the KV binding.
 
-Put that URL into [`../visitor.js`](../visitor.js) as `COUNTER_API`, then commit.
+## Deploying from scratch (new account)
+
+```bash
+wrangler login
+wrangler kv namespace create COUNTER   # paste the id into wrangler.toml
+wrangler deploy                        # prints the Worker URL
+```
+
+A `workers.dev` subdomain must exist on the account before the first deploy;
+Cloudflare prompts for one, and its certificate can take several minutes to
+provision before the URL responds.
 
 ## Seeding a starting number
 

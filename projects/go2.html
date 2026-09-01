@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Go2 Quadruped — Autonomous Exploration &amp; Mapping | Mohamed Nadim Touil</title>
-  <meta name="description" content="Frontier-based autonomous exploration, SLAM and geofencing for the Unitree Go2 quadruped in ROS 2 — deployed indoors and extended to outdoor sites at EagleProjects." />
+  <meta name="description" content="Frontier-based autonomous exploration, SLAM and GPS geofencing for the Unitree Go2 quadruped in ROS 2 — built at EagleProjects for indoor survey work, extended outdoors." />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../project.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -40,33 +40,19 @@
       <div class="eyebrow">Project 01 — Legged Autonomy</div>
       <h1 class="proj-title">Go2 Quadruped — <em>Autonomous Exploration</em></h1>
       <p class="proj-tagline">
-        A Unitree Go2 walks into a building it has never seen, decides where to go on its own,
-        maps the whole thing, and comes back — no operator, no pre-supplied map, no waypoints
-        typed in by a human.
+        A Unitree Go2 walks into a building it has never seen, chooses its own goals, maps the space,
+        and stops when there is nothing left to explore. No operator, no prior map, no waypoints.
       </p>
 
       <div class="proj-meta">
-        <div>
-          <span class="pmeta-k">Role</span>
-          <span class="pmeta-v">Robotics &amp; AI Software Engineer</span>
-        </div>
-        <div>
-          <span class="pmeta-k">Where</span>
-          <span class="pmeta-v">EagleProjects Tunisia</span>
-        </div>
-        <div>
-          <span class="pmeta-k">Timeline</span>
-          <span class="pmeta-v">May 2025 — present</span>
-        </div>
-        <div>
-          <span class="pmeta-k">Platform</span>
-          <span class="pmeta-v">Unitree Go2 · real hardware</span>
-        </div>
+        <div><span class="pmeta-k">Role</span><span class="pmeta-v">Robotics &amp; AI Software Engineer</span></div>
+        <div><span class="pmeta-k">Where</span><span class="pmeta-v">EagleProjects Tunisia</span></div>
+        <div><span class="pmeta-k">Timeline</span><span class="pmeta-v">May 2025 — present</span></div>
+        <div><span class="pmeta-k">Platform</span><span class="pmeta-v live">Unitree Go2 · real hardware</span></div>
       </div>
 
       <div class="proj-actions">
         <a href="../index.html#contact" class="btn-primary">Ask me about this work</a>
-        <a href="https://github.com/Hypothalmuss/m-explore-ros2" target="_blank" rel="noopener" class="btn-secondary">Exploration stack</a>
       </div>
     </div>
   </header>
@@ -75,70 +61,33 @@
   <section class="section">
     <div class="container">
 
-      <!-- Spec sheet -->
       <div class="specsheet">
         <div class="specsheet-head">
           <span>System Specification</span>
           <span class="dot" aria-hidden="true"></span>
         </div>
         <div class="specsheet-grid">
-          <div class="spec-row">
-            <div class="spec-k">Robot</div>
-            <div class="spec-v">Unitree Go2 quadruped</div>
-          </div>
-          <div class="spec-row">
-            <div class="spec-k">Middleware</div>
-            <div class="spec-v">ROS 2 Humble</div>
-          </div>
-          <div class="spec-row">
-            <div class="spec-k">Perception</div>
-            <div class="spec-v">3D LiDAR · depth camera · IMU · GPS</div>
-          </div>
-          <div class="spec-row">
-            <div class="spec-k">Mapping</div>
-            <div class="spec-v">2D occupancy SLAM + OctoMap 3D volumetric</div>
-          </div>
-          <div class="spec-row">
-            <div class="spec-k">Navigation</div>
-            <div class="spec-v">Nav2 · custom path follower · reactive avoidance</div>
-          </div>
-          <div class="spec-row">
-            <div class="spec-k">Exploration</div>
-            <div class="spec-v">Frontier-based, autonomous goal selection</div>
-          </div>
-          <div class="spec-row">
-            <div class="spec-k">Safety</div>
-            <div class="spec-v">GPS geofencing · hard boundary enforcement</div>
-          </div>
-          <div class="spec-row">
-            <div class="spec-k">Environments</div>
-            <div class="spec-v">Indoor rooms &amp; corridors, extended outdoors</div>
-          </div>
+          <div class="spec-row"><div class="spec-k">Robot</div><div class="spec-v">Unitree Go2 quadruped</div></div>
+          <div class="spec-row"><div class="spec-k">Middleware</div><div class="spec-v">ROS 2 Humble · Python</div></div>
+          <div class="spec-row"><div class="spec-k">Perception</div><div class="spec-v">3D LiDAR · depth camera · IMU · GPS</div></div>
+          <div class="spec-row"><div class="spec-k">Mapping</div><div class="spec-v">2D occupancy SLAM + OctoMap 3D</div></div>
+          <div class="spec-row"><div class="spec-k">Navigation</div><div class="spec-v">Nav2 · custom path follower</div></div>
+          <div class="spec-row"><div class="spec-k">Exploration</div><div class="spec-v">Frontier-based goal selection</div></div>
+          <div class="spec-row"><div class="spec-k">Safety</div><div class="spec-v">GPS geofence, enforced outside the planner</div></div>
+          <div class="spec-row"><div class="spec-k">Environments</div><div class="spec-v">Indoor rooms &amp; corridors, extended outdoors</div></div>
         </div>
       </div>
-      <p class="media-cap">Hardware is off-the-shelf; the autonomy stack on top of it is the work.</p>
+      <p class="media-cap">Hardware is off-the-shelf. The autonomy stack on top of it is the work.</p>
 
       <div class="proj-body">
 
         <h2>The problem</h2>
         <p>
-          A quadruped is only useful if someone doesn't have to drive it. The brief was survey work:
-          send the robot into a space — a floor of a building, a site perimeter — and get back a map
-          plus the confidence that it never walked anywhere it shouldn't have.
+          Survey work: send a quadruped into a space and get back a map, plus the confidence that it never
+          walked anywhere it shouldn't have. That rules out teleoperation, and it rules out pre-planned
+          waypoint routes — <strong>you cannot plan waypoints through a building you have not mapped
+          yet.</strong> The robot has to choose its own goals from what it has seen so far.
         </p>
-        <p>
-          That rules out teleoperation, and it rules out pre-planned waypoint routes, because
-          <strong>you cannot plan waypoints through a building you have not mapped yet</strong>.
-          The robot has to choose its own goals from what it has seen so far.
-        </p>
-
-        <h2>What I built</h2>
-        <ul class="ticks">
-          <li><strong>Frontier-based exploration.</strong> The robot continuously finds the boundaries between mapped free space and the unknown, ranks those frontiers, and drives to the one that buys the most new information for the distance travelled. When frontiers run out, the space is covered and the mission ends on its own.</li>
-          <li><strong>SLAM and mapping pipelines in ROS 2.</strong> A 2D occupancy grid for planning, plus an OctoMap volumetric layer so overhangs, tables and low obstacles exist to the planner rather than vanishing into a flat projection — which matters a lot for a legged robot that can step over some things and must go around others.</li>
-          <li><strong>Navigation and reactive obstacle avoidance.</strong> Nav2 for global planning, with a path-following layer that handles the gap between a planner's idea of a path and how a walking robot actually tracks it.</li>
-          <li><strong>GPS geofencing.</strong> A hard, independently-enforced boundary. The robot can plan whatever it likes; if a goal or a trajectory leaves the permitted polygon, it is refused. On an outdoor site this is the difference between a survey tool and a liability.</li>
-        </ul>
 
         <div class="proj-media">
           <video controls preload="none" playsinline muted poster="../assets/posters/go2-nav.jpg">
@@ -147,102 +96,105 @@
           </video>
         </div>
         <p class="media-cap">
-          Autonomous exploration run, played back at 4× — Gazebo on the left, RViz showing the occupancy
-          grid filling in as the robot picks its own frontier goals, and the ROS 2 planner lifecycle in the terminal.
+          Exploration run at 4× — Gazebo left, RViz showing the occupancy grid filling in as the robot
+          picks its own frontier goals.
         </p>
 
-        <h2>How the pieces fit</h2>
+        <h2>Architecture</h2>
         <p>
-          The stack is a loop, not a pipeline. Every element feeds the next and the mission manager sits
-          above all of it deciding whether the current goal is still worth pursuing:
+          A loop, not a pipeline. The mission manager sits above everything, deciding whether the current
+          goal is still worth pursuing, and the geofence vetoes anything leaving the permitted polygon
+          regardless of what the planner wants.
         </p>
 
         <div class="diagram">
           <svg viewBox="0 0 700 300" role="img" aria-labelledby="go2-dg-title">
-            <title id="go2-dg-title">Go2 autonomy architecture: sensors feed SLAM, which feeds the frontier explorer and mission manager, which command Nav2 and the path follower, gated by the geofence before reaching the robot base.</title>
+            <title id="go2-dg-title">Sensors feed SLAM; SLAM feeds the frontier explorer and mission manager; those command Nav2 and the path follower, gated by the geofence before reaching the robot base, with new observations closing the loop.</title>
             <defs>
               <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                 <path d="M 0 0 L 10 5 L 0 10 z" class="dg-arrow" />
               </marker>
             </defs>
 
-            <!-- Sensors -->
             <rect x="10"  y="120" width="105" height="46" rx="6" class="dg-node" />
-            <text x="62" y="140" text-anchor="middle" class="dg-label">Sensors</text>
-            <text x="62" y="154" text-anchor="middle" class="dg-sub">LiDAR · IMU · GPS</text>
+            <text x="62"  y="140" text-anchor="middle" class="dg-label">Sensors</text>
+            <text x="62"  y="154" text-anchor="middle" class="dg-sub">LiDAR · IMU · GPS</text>
 
-            <!-- SLAM -->
             <rect x="155" y="120" width="105" height="46" rx="6" class="dg-node" />
             <text x="207" y="140" text-anchor="middle" class="dg-label">SLAM</text>
             <text x="207" y="154" text-anchor="middle" class="dg-sub">grid + OctoMap</text>
 
-            <!-- Explorer -->
-            <rect x="300" y="55" width="115" height="46" rx="6" class="dg-node-a" />
-            <text x="357" y="75" text-anchor="middle" class="dg-label">Frontier</text>
-            <text x="357" y="89" text-anchor="middle" class="dg-sub">explorer</text>
+            <rect x="300" y="55"  width="115" height="46" rx="6" class="dg-node-a" />
+            <text x="357" y="75"  text-anchor="middle" class="dg-label">Frontier</text>
+            <text x="357" y="89"  text-anchor="middle" class="dg-sub">explorer</text>
 
-            <!-- Mission manager -->
             <rect x="300" y="185" width="115" height="46" rx="6" class="dg-node-a" />
             <text x="357" y="205" text-anchor="middle" class="dg-label">Mission</text>
             <text x="357" y="219" text-anchor="middle" class="dg-sub">manager</text>
 
-            <!-- Nav2 -->
             <rect x="455" y="120" width="105" height="46" rx="6" class="dg-node" />
             <text x="507" y="140" text-anchor="middle" class="dg-label">Nav2 +</text>
             <text x="507" y="154" text-anchor="middle" class="dg-sub">path follower</text>
 
-            <!-- Geofence -->
-            <rect x="455" y="15" width="105" height="40" rx="6" class="dg-node-a" />
-            <text x="507" y="32" text-anchor="middle" class="dg-label">Geofence</text>
-            <text x="507" y="45" text-anchor="middle" class="dg-sub">veto</text>
+            <rect x="455" y="15"  width="105" height="40" rx="6" class="dg-node-a" />
+            <text x="507" y="32"  text-anchor="middle" class="dg-label">Geofence</text>
+            <text x="507" y="45"  text-anchor="middle" class="dg-sub">veto</text>
 
-            <!-- Robot -->
-            <rect x="600" y="120" width="90" height="46" rx="6" class="dg-node" />
+            <rect x="600" y="120" width="90"  height="46" rx="6" class="dg-node" />
             <text x="645" y="140" text-anchor="middle" class="dg-label">Go2 base</text>
             <text x="645" y="154" text-anchor="middle" class="dg-sub">gait ctrl</text>
 
-            <!-- Edges -->
-            <path d="M 115 143 H 152"                     class="dg-edge" marker-end="url(#arrow)" />
-            <path d="M 260 137 Q 280 137 280 78 H 297"    class="dg-edge" marker-end="url(#arrow)" />
-            <path d="M 260 150 Q 280 150 280 208 H 297"   class="dg-edge" marker-end="url(#arrow)" />
-            <path d="M 415 78 Q 440 78 440 137 H 452"     class="dg-edge" marker-end="url(#arrow)" />
-            <path d="M 415 208 Q 440 208 440 150 H 452"   class="dg-edge" marker-end="url(#arrow)" />
-            <path d="M 507 120 V 58"                      class="dg-edge" marker-end="url(#arrow)" />
-            <path d="M 560 143 H 597"                     class="dg-edge" marker-end="url(#arrow)" />
-            <!-- feedback loop -->
-            <path d="M 645 166 V 265 H 62 V 168"          class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 115 143 H 152"                    class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 260 137 Q 280 137 280 78 H 297"   class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 260 150 Q 280 150 280 208 H 297"  class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 415 78  Q 440 78 440 137 H 452"   class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 415 208 Q 440 208 440 150 H 452"  class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 507 120 V 58"                     class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 560 143 H 597"                    class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 645 166 V 265 H 62 V 168"         class="dg-edge" marker-end="url(#arrow)" />
 
             <text x="133" y="137" text-anchor="middle" class="dg-topic">/scan</text>
             <text x="353" y="277" text-anchor="middle" class="dg-topic">odometry + new observations close the loop</text>
           </svg>
         </div>
-        <p class="media-cap">Teal blocks are the parts I wrote; the rest is standard ROS 2 infrastructure wired to them.</p>
+        <p class="media-cap">Teal blocks are the parts I wrote; the rest is ROS 2 infrastructure wired to them.</p>
 
-        <h2>The hard part nobody warns you about</h2>
+        <h2>The challenges</h2>
+
+        <h3>Goals the robot can see but cannot reach</h3>
         <p>
-          Frontier exploration has a failure mode that only shows up on real hardware: <strong>a goal the
-          robot can see but cannot reach.</strong> A frontier just past a doorway the robot doesn't fit
-          through, or one behind a wall it can perceive over. The planner accepts the goal, the robot
-          drives at it, gets close, and then grinds — nudging, re-planning, nudging again, forever.
-          The mission never advances and the map never completes.
+          A frontier just past a doorway too narrow for the robot, or one behind a wall it can perceive
+          over. The planner accepts the goal, the robot drives at it, gets close, then grinds — nudging,
+          re-planning, nudging — forever. The mission never advances and the map never completes.
+        </p>
+        <p>
+          The original recovery only triggered while the obstacle-avoidance layer had paused the robot.
+          That covered the obvious case and missed the common one: stuck against a wall <em>during a final
+          orientation spin</em>, where avoidance never fires because nothing is in front. Those control
+          loops had no exit condition.
+        </p>
+        <p>
+          The fix made the timeout a property of the motion rather than of the avoidance state. Every
+          waypoint-following and orientation loop enforces its own deadline, set to a multiple of expected
+          travel time. On expiry the goal is marked unreachable, the mission manager discards it, and the
+          explorer picks a fresh frontier — a few seconds lost instead of the whole run.
         </p>
 
-        <div class="note">
-          <div class="note-k">Engineering note — the bug that mattered</div>
-          <p>
-            The original recovery logic only triggered while the obstacle-avoidance layer had actively
-            paused the robot. That covered the obvious case and missed the common one: a robot stuck
-            against a wall <em>during a final orientation spin</em>, where avoidance never fires because
-            nothing is in front of it. The control loops had no exit condition and would spin indefinitely.
-          </p>
-          <p>
-            The fix was to make the timeout a property of the motion itself rather than of the avoidance
-            state — every waypoint-following and orientation loop enforces its own deadline, set to a
-            multiple of the expected travel time. When it expires, the goal is marked unreachable, the
-            mission manager discards it, and the explorer immediately picks a fresh frontier. One stuck
-            goal costs a few seconds now instead of ending the mission.
-          </p>
-        </div>
+        <h3>Extending an indoor stack outdoors</h3>
+        <p>
+          Larger open spaces put frontiers further apart, so a bad choice costs more. Uneven ground starts
+          to break the flat-world assumption behind a 2D occupancy grid, which is why the OctoMap layer
+          matters — overhangs and low obstacles stay visible to the planner instead of flattening away.
+          GPS arrives as both a global reference and the geofence that makes outdoor autonomy permissible.
+        </p>
+
+        <h2>Results</h2>
+        <ul class="ticks">
+          <li>Full autonomous coverage of indoor spaces with no operator input and no prior map — the run terminates on its own when frontiers are exhausted.</li>
+          <li>Unreachable goals degraded from a mission-ending stall to a few seconds of lost time.</li>
+          <li>Stack extended from indoor-only to outdoor sites, with geofencing enforced independently of the planner.</li>
+          <li>Reactive avoidance handles moving obstacles rather than assuming a static map.</li>
+        </ul>
 
         <div class="proj-media">
           <video controls preload="none" playsinline muted poster="../assets/posters/go2-obstacle-avoidance.jpg">
@@ -250,33 +202,20 @@
             Your browser does not support HTML5 video.
           </video>
         </div>
-        <p class="media-cap">
-          Reactive obstacle avoidance against a moving obstacle — the robot re-plans around a body
-          crossing its path rather than treating the map as static.
-        </p>
+        <p class="media-cap">Reactive avoidance against a moving obstacle crossing the robot's path.</p>
 
-        <h2>Indoors first, then outdoors</h2>
+        <h2>Outcome</h2>
         <p>
-          The system was built for interiors, where LiDAR SLAM is well-behaved and there is no GPS.
-          Extending it outdoors changed the problem: larger and more open spaces, so frontiers are further
-          apart and the cost of choosing a bad one is higher; uneven ground, where the flat-world
-          assumption behind a 2D occupancy grid starts to lie; and the arrival of GPS, which brings both
-          a global reference frame and the geofencing that makes outdoor autonomy permissible at all.
-        </p>
-
-        <h2>What I'd tell you in an interview</h2>
-        <p>
-          The interesting engineering here was not the SLAM or the planner — those are solved problems with
-          good open-source implementations. It was <strong>everything that decides what to do when the
-          solved problems return an answer that doesn't work</strong>: unreachable goals, frontiers that
-          aren't really frontiers, a robot that is technically making progress but practically stuck.
-          A demo runs for two minutes. An autonomous survey has to run for an hour without a human, and
-          that is entirely a question of how many failure modes you have thought about.
+          The SLAM and the planner were the solved parts — good open-source implementations exist for both.
+          The engineering that mattered was <strong>everything deciding what to do when those solved
+          problems return an answer that doesn't work</strong>: unreachable goals, frontiers that aren't
+          really frontiers, a robot technically making progress but practically stuck. A demo runs for two
+          minutes; an autonomous survey has to run for an hour unattended, and the gap between those two is
+          entirely a question of how many failure modes you have handled.
         </p>
 
       </div>
 
-      <!-- Prev / next -->
       <nav class="proj-nav">
         <a href="../index.html#projects" class="pnav-card">
           <div class="pnav-k">← Back to</div>

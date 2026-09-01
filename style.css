@@ -991,3 +991,29 @@ footer p { font-size: 0.78rem; color: rgba(255,255,255,0.55); }
   .edu-card { padding: 1.3rem 1.35rem; }
   .skills-grid { gap: 1.25rem; }
 }
+
+/* ══════════════════════════════════════════════════
+   PROJECT CARD — kind badge (hardware vs simulation)
+══════════════════════════════════════════════════ */
+.pcard-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+.pkind {
+  font-size: 0.6rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-md);
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.pkind-hw {
+  color: var(--accent);
+  border-color: var(--border-accent);
+  background: var(--accent-lt);
+}

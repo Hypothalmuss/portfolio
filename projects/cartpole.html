@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CartPole Goes Brrr — Reinforcement Learning | Mohamed Nadim Touil</title>
-  <meta name="description" content="Nine PPO tasks on one cartpole rig in PyBullet — balance, crawl, hop, walk, and imitation learning from human motion capture. Includes the reward-hacking bugs found and the post-mortems." />
+  <meta name="description" content="Nine PPO tasks on one cartpole rig in PyBullet — balance, crawl, hop, walk, and imitation learning from human motion capture at 99% success, with the reward-hacking bugs documented." />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../project.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -40,28 +40,16 @@
       <div class="eyebrow">Project 04 — Reinforcement Learning</div>
       <h1 class="proj-title">CartPole <em>Goes Brrr</em></h1>
       <p class="proj-tagline">
-        One cartpole rig, nine increasingly ridiculous jobs. It starts as the textbook balance problem
-        and ends as a stick figure walking from human motion capture. The point was to learn RL properly —
-        which mostly meant learning how many ways a reward function can lie to you.
+        One cartpole rig, nine increasingly ridiculous jobs — from the textbook balance problem to a stick
+        figure walking from human motion capture. Learning RL properly, which mostly meant learning how many
+        ways a reward function can lie to you.
       </p>
 
       <div class="proj-meta" data-gh-repo="CartPole-Goes-Brrr">
-        <div>
-          <span class="pmeta-k">Type</span>
-          <span class="pmeta-v">Personal research project</span>
-        </div>
-        <div>
-          <span class="pmeta-k">Language</span>
-          <span class="pmeta-v live" data-gh="language">Python</span>
-        </div>
-        <div>
-          <span class="pmeta-k">Last commit</span>
-          <span class="pmeta-v live" data-gh="updated">recently</span>
-        </div>
-        <div>
-          <span class="pmeta-k">Stack</span>
-          <span class="pmeta-v">PyBullet · Stable-Baselines3 PPO</span>
-        </div>
+        <div><span class="pmeta-k">Type</span><span class="pmeta-v">Personal research · simulation</span></div>
+        <div><span class="pmeta-k">Language</span><span class="pmeta-v live" data-gh="language">Python</span></div>
+        <div><span class="pmeta-k">Last commit</span><span class="pmeta-v live" data-gh="updated">recently</span></div>
+        <div><span class="pmeta-k">Stack</span><span class="pmeta-v">PyBullet · Stable-Baselines3 PPO</span></div>
       </div>
 
       <div class="proj-actions">
@@ -81,112 +69,110 @@
           Your browser does not support HTML5 video.
         </video>
       </div>
-      <p class="media-cap">Showreel — the same rig, reconfigured across tasks.</p>
+      <p class="media-cap">The same rig, reconfigured across tasks.</p>
 
       <div class="proj-body">
 
-        <h2>The nine tasks</h2>
-        <div class="proj-table-wrap">
-          <table class="proj-table">
-            <thead>
-              <tr><th>Task</th><th>Objective</th><th>Action space</th><th>Result</th><th>Steps</th></tr>
-            </thead>
-            <tbody>
-              <tr><td><strong>Balance (1L)</strong></td><td>Keep the pole upright on a rail</td><td>1D force ±25 N</td><td class="num">90%</td><td>999K</td></tr>
-              <tr><td><strong>Balance (2L)</strong></td><td>Keep a double pendulum upright</td><td>1D force ±100 N</td><td class="num">63%</td><td>3M</td></tr>
-              <tr><td><strong>Crawl</strong></td><td>Drag the cart with joint torque alone</td><td>2D torque</td><td class="num">5 m/ep</td><td>1M</td></tr>
-              <tr><td><strong>Hop</strong></td><td>Gantry-constrained 2D hopping</td><td>2D torque</td><td class="num">16.9 m/ep</td><td>1M</td></tr>
-              <tr><td><strong>Legged stand</strong></td><td>Planar biped, stand still</td><td>6D torque</td><td class="num">89%</td><td>6M</td></tr>
-              <tr><td><strong>Legged walk</strong></td><td>Planar biped, walk forward</td><td>6D torque</td><td class="num">5.6 m/ep, 88%</td><td>8M</td></tr>
-              <tr><td><strong>Stickman stand</strong></td><td>Trunk, head and arms, stand still</td><td>9D torque</td><td class="num">88%</td><td>6M</td></tr>
-              <tr><td><strong>Stickman walk</strong></td><td>Full stick figure, walk forward</td><td>9D torque</td><td class="num">5.8 m/ep, 75%</td><td>8M</td></tr>
-              <tr><td><strong>Stickman mimic</strong></td><td>Imitate human motion capture</td><td>9D torque</td><td class="num">99%, 17 m/ep</td><td>8M</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h2>Three times the reward function lied</h2>
+        <h2>The problem</h2>
         <p>
-          The through-line of this project is not the policies. It is that a reward function will always find
-          the cheapest thing that satisfies it, and that "cheapest" is almost never what you meant. Each of
-          these took real debugging to find.
+          Take one physics rig and give it progressively harder jobs it was never designed for, so that each
+          failure isolates something specific about reward design. The real subject is not the policies —
+          it is that <strong>a reward function always finds the cheapest thing that satisfies it, and
+          "cheapest" is almost never what you meant.</strong>
         </p>
 
-        <h3>1. The success rate that was never real</h3>
-        <div class="note">
-          <div class="note-k">It wasn't 30%. It was 0%.</div>
-          <p>
-            The two-link balance task reported 30% success for a long time. It was actually zero. The
-            termination check tested an angle the pole <strong>physically could not reach</strong> —
-            <code>link1</code>'s collision geometry caught it on the floor first — so a face-plant simply ran
-            out the clock and got scored as a win.
-          </p>
-          <p>
-            Three more bugs sat underneath: penalties linear in raw Newtons that made using the actuator
-            net-negative (the agent settled on 6.6 N of a 100 N budget — it had learned that moving was a
-            mistake), an un-normalised action space, and 240 Hz control that left <code>gamma=0.99</code>
-            with just 0.42 s of effective lookahead.
-          </p>
-          <p>
-            Rebuilt with geometric tip-height termination, a normalised action space, 60 Hz control, and
-            nine reward terms collapsed into one — it now runs at a genuine <strong>63%</strong>. Of the 37
-            failures in 100 episodes, 36 are the cart running out of rail with the pole still upright.
-          </p>
-        </div>
+        <h2>The challenges</h2>
 
-        <div class="proj-media">
-          <video autoplay loop muted playsinline preload="none" poster="../assets/posters/cartpole-crawl.jpg">
-            <source src="../assets/videos/cartpole-crawl.mp4" type="video/mp4" />
-            Your browser does not support HTML5 video.
-          </video>
-        </div>
-        <p class="media-cap">
-          The crawl task — rail removed, the pole drags the cart forward like an inchworm using its own
-          joint torques. Asymmetric friction (cart glides, tip grips) is the physical half of the trick.
-        </p>
-
-        <h3>2. "Moved forward" is not "walked"</h3>
+        <h3>A success rate that was never real</h3>
         <p>
-          The planar biped reached 6.4 m per episode against a random baseline of −0.02 m. It looked like
-          progress. It wasn't walking — it was <strong>skating</strong>. Both feet stayed on the ground 98%
-          of the time, the knees never left their straight hard stop, and there was more foot slip than
-          actual forward travel.
+          The two-link balance task reported 30% success for months. It was actually <strong>zero</strong>.
+          The termination check tested an angle the pole physically could not reach — <code>link1</code>'s
+          collision geometry caught it on the floor first — so a face-plant ran out the clock and scored as
+          a win. Underneath sat three more bugs: penalties linear in raw Newtons that made using the
+          actuator net-negative (the agent settled on 6.6 N of a 100 N budget), an un-normalised action
+          space, and 240 Hz control leaving <code>gamma=0.99</code> just 0.42 s of lookahead.
         </p>
         <p>
-          Forward velocity paid exactly the same whether the robot stepped or slid, and nothing in the
-          reward objected. Same shape of hole as the unreachable termination check: <em>a metric measuring
-          something adjacent to the thing you wanted</em>.
+          Rebuilt with geometric tip-height termination, a normalised action space, 60 Hz control and nine
+          reward terms collapsed into one, it runs at a genuine <strong>63%</strong> — and 36 of the 37
+          failures are the cart running out of rail with the pole still upright.
         </p>
 
-        <h3>3. PPO destroying a working policy</h3>
+        <h3>"Moved forward" is not "walked"</h3>
+        <p>
+          The planar biped reached 6.4 m per episode against a random baseline of −0.02 m. It was
+          <strong>skating</strong>: both feet on the ground 98% of the time, knees never leaving their
+          straight hard stop, more foot slip than forward travel. Forward velocity paid identically whether
+          the robot stepped or slid, and nothing in the reward objected — the same shape of hole as the
+          unreachable termination check, a metric measuring something <em>adjacent</em> to the thing wanted.
+        </p>
+
+        <h3>PPO destroying a policy it had already learned</h3>
         <p>
           The imitation run reached near-full-episode tracking at 1.1M steps, then collapsed.
           <code>approx_kl</code> hit 100× its healthy range as the policy sharpened, and ten unguarded
-          epochs per batch kept overshooting. The final model evaluated at <strong>0%</strong> — while its
-          own 1.1M checkpoint evaluated at 80%. Run 2 added <code>target_kl</code>, learning-rate decay, and
-          dropped reward normalisation (the mimic reward is already bounded). It finished at 99% with no
-          collapse.
+          epochs per batch kept overshooting. The final model evaluated at <strong>0%</strong> while its own
+          1.1M checkpoint evaluated at 80%. Run 2 added <code>target_kl</code>, learning-rate decay, and
+          dropped reward normalisation — 99%, no collapse.
         </p>
 
-        <h2>The fix that replaced seven reward terms</h2>
+        <h2>The fix: demonstrate instead of specify</h2>
         <p>
           The walking reward lineage — slip penalties, clearance bonuses, step machines, alternation
-          discounts, overtake rules — was seven terms of hand-crafted economics, and what it bought was
-          skating, then shuffling, then a gallop.
+          discounts, overtake rules — was seven terms of hand-crafted economics, and it bought skating, then
+          shuffling, then a gallop. The final task throws all of it out for one idea from
+          <strong>DeepMimic</strong>: a reference motion says where every joint should be at every phase,
+          and the reward is closeness to it.
         </p>
-        <p>
-          The final task throws all of it away for one idea from <strong>DeepMimic</strong>: a reference
-          motion says where every joint should be at every phase of the gait, and the reward is simply
-          closeness to it. <em>"Walk like this"</em> instead of <em>"move forward without doing any of the
-          nine things we thought of"</em>.
-        </p>
-        <p>
-          The reference is CMU motion capture of a human walking, retargeted through forward kinematics,
-          sagittal projection, the URDF's joint conventions, Froude time scaling for legs 0.8× human length,
-          and a root height solved on the robot's own foot geometry so the reference never floats or clips
-          the floor. The body needed rebuilding for it too — the ankle moved to a third of the way along a
-          longer foot (a centred foot has no toe-off lever) and mass ratios corrected to human proportions
-          (v1 carried 16% of its mass in the trunk and head; a human carries about 45%).
+
+        <div class="diagram">
+          <svg viewBox="0 0 700 250" role="img" aria-labelledby="cp-dg-title">
+            <title id="cp-dg-title">CMU motion capture is retargeted through forward kinematics, sagittal projection, Froude time scaling and a solved root height into a reference motion; that reference supplies the phase observation, reference-state initialisation and early termination that shape PPO training, producing a policy evaluated in PyBullet physics.</title>
+            <defs>
+              <marker id="arrow4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" class="dg-arrow" />
+              </marker>
+            </defs>
+
+            <rect x="8"   y="100" width="96"  height="46" rx="6" class="dg-node" />
+            <text x="56"  y="120" text-anchor="middle" class="dg-label">CMU mocap</text>
+            <text x="56"  y="134" text-anchor="middle" class="dg-sub">human walk</text>
+
+            <rect x="138" y="100" width="112" height="46" rx="6" class="dg-node-a" />
+            <text x="194" y="120" text-anchor="middle" class="dg-label">Retarget</text>
+            <text x="194" y="134" text-anchor="middle" class="dg-sub">FK · Froude scale</text>
+
+            <rect x="284" y="100" width="112" height="46" rx="6" class="dg-node-a" />
+            <text x="340" y="120" text-anchor="middle" class="dg-label">Reference</text>
+            <text x="340" y="134" text-anchor="middle" class="dg-sub">joint · phase</text>
+
+            <rect x="284" y="10"  width="112" height="58" rx="6" class="dg-node-a" />
+            <text x="340" y="29"  text-anchor="middle" class="dg-label">Phase · RSI</text>
+            <text x="340" y="43"  text-anchor="middle" class="dg-sub">early termination</text>
+            <text x="340" y="57"  text-anchor="middle" class="dg-sub">the load-bearing 3</text>
+
+            <rect x="430" y="100" width="112" height="46" rx="6" class="dg-node-a" />
+            <text x="486" y="120" text-anchor="middle" class="dg-label">PPO</text>
+            <text x="486" y="134" text-anchor="middle" class="dg-sub">target_kl bounded</text>
+
+            <rect x="576" y="100" width="112" height="46" rx="6" class="dg-node" />
+            <text x="632" y="120" text-anchor="middle" class="dg-label">Policy</text>
+            <text x="632" y="134" text-anchor="middle" class="dg-sub">PyBullet physics</text>
+
+            <path d="M 104 123 H 135"  class="dg-edge" marker-end="url(#arrow4)" />
+            <path d="M 250 123 H 281"  class="dg-edge" marker-end="url(#arrow4)" />
+            <path d="M 340 100 V 72"   class="dg-edge" marker-end="url(#arrow4)" />
+            <path d="M 396 123 H 427"  class="dg-edge" marker-end="url(#arrow4)" />
+            <path d="M 396 39 Q 486 39 486 97" class="dg-edge" marker-end="url(#arrow4)" />
+            <path d="M 542 123 H 573"  class="dg-edge" marker-end="url(#arrow4)" />
+            <path d="M 632 146 V 200 H 486 V 149" class="dg-edge" marker-end="url(#arrow4)" />
+
+            <text x="559" y="215" text-anchor="middle" class="dg-topic">rollouts</text>
+          </svg>
+        </div>
+        <p class="media-cap">
+          Three mechanisms carry the training, all load-bearing: gait phase in the observation,
+          reference-state initialisation, and early termination when the pose diverges.
         </p>
 
         <div class="proj-media">
@@ -196,10 +182,11 @@
           </video>
         </div>
         <p class="media-cap">
-          The mimic pipeline end to end — CMU's capture, the human skeleton, the retargeted reference,
-          and the policy running in real physics, phase-locked.
+          CMU's capture, the human skeleton, the retargeted reference, and the policy in real physics —
+          phase-locked.
         </p>
 
+        <h2>Results</h2>
         <div class="metrics">
           <div class="metric">
             <div class="metric-n">99<span class="unit">%</span></div>
@@ -218,57 +205,45 @@
             <div class="metric-l">against the reference's 1.18 m/s</div>
           </div>
         </div>
-
         <p>
-          The part that matters: <strong>none of those sub-behaviours are named in the reward.</strong>
-          Step alternation, 4.3 cm swing clearance, 85% single support, the collapse in foot slip — all of
-          it falls out of "match the reference", and all of it had previously resisted seven hand-written
-          terms trying to buy it directly.
+          <strong>None of those sub-behaviours are named in the reward.</strong> Step alternation, 4.3 cm
+          swing clearance, 85% single support, the collapse in foot slip — all of it falls out of "match the
+          reference", and all of it had previously resisted seven hand-written terms trying to buy it
+          directly.
         </p>
 
-        <h2>Constraint as curriculum</h2>
-        <p>
-          Two tasks use a gantry — passive, frictionless prismatic rails that lock out rotation and sideways
-          drift. This is the same approach real hopping research used (the Raibert hopper, the MIT Leg Lab):
-          a boom that constrains the problem to 2D so you can study hopping dynamics without simultaneously
-          solving 3D balance.
-        </p>
-        <p>
-          The rails never push, brake, or script the cart's trajectory — it moves purely from foot-ground
-          contact forces. The agent still has to learn a genuine compress–extend–flight–land cycle. It just
-          doesn't have to learn not to fall sideways at the same time. <strong>A constraint that removes a
-          sub-problem is a curriculum tool, not a cheat</strong> — as long as you say which one it is.
-        </p>
-
-        <div class="proj-media">
-          <video autoplay loop muted playsinline preload="none" poster="../assets/posters/cartpole-hop.jpg">
-            <source src="../assets/videos/cartpole-hop.mp4" type="video/mp4" />
-            Your browser does not support HTML5 video.
-          </video>
+        <div class="proj-table-wrap">
+          <table class="proj-table">
+            <thead>
+              <tr><th>Task</th><th>Objective</th><th>Action space</th><th>Result</th><th>Steps</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Balance (1L)</strong></td><td>Pole upright on a rail</td><td>1D force ±25 N</td><td class="num">90%</td><td>999K</td></tr>
+              <tr><td><strong>Balance (2L)</strong></td><td>Double pendulum upright</td><td>1D force ±100 N</td><td class="num">63%</td><td>3M</td></tr>
+              <tr><td><strong>Crawl</strong></td><td>Drag the cart with joint torque</td><td>2D torque</td><td class="num">5 m/ep</td><td>1M</td></tr>
+              <tr><td><strong>Hop</strong></td><td>Gantry-constrained 2D hopping</td><td>2D torque</td><td class="num">16.9 m/ep</td><td>1M</td></tr>
+              <tr><td><strong>Legged stand</strong></td><td>Planar biped, stand still</td><td>6D torque</td><td class="num">89%</td><td>6M</td></tr>
+              <tr><td><strong>Legged walk</strong></td><td>Planar biped, walk forward</td><td>6D torque</td><td class="num">5.6 m/ep, 88%</td><td>8M</td></tr>
+              <tr><td><strong>Stickman stand</strong></td><td>Trunk, head, arms — stand</td><td>9D torque</td><td class="num">88%</td><td>6M</td></tr>
+              <tr><td><strong>Stickman walk</strong></td><td>Full figure, walk forward</td><td>9D torque</td><td class="num">5.8 m/ep, 75%</td><td>8M</td></tr>
+              <tr><td><strong>Stickman mimic</strong></td><td>Imitate human mocap</td><td>9D torque</td><td class="num">99%, 17 m/ep</td><td>8M</td></tr>
+            </tbody>
+          </table>
         </div>
-        <p class="media-cap">
-          The gantry-constrained hopper — a genuine compress, extend, flight, land cycle at
-          16.9 m per episode. The rails prevent tipping; they never provide propulsion.
+
+        <h2>Outcome</h2>
+        <p>
+          Every real gain here came from finding a broken measurement, not a better hyperparameter. One
+          geometric quantity beat nine hand-weighted terms; one reference trajectory bought clearance,
+          alternation and no-slip for free; and PPO proved it can destroy a working policy as efficiently as
+          it builds one when nothing bounds the update size.
         </p>
-
-        <h2>What this project actually taught</h2>
-        <ul class="ticks">
-          <li>Diagnostics before hyperparameters. Every real gain here came from finding a broken measurement, not from a better learning rate.</li>
-          <li>One geometric quantity beats nine hand-weighted terms — tip height replaced a per-joint cosine reward that was happily paying for a folded pose.</li>
-          <li>Some behaviours cannot be specified in reward terms, only demonstrated.</li>
-          <li>PPO can destroy a working policy as efficiently as it builds one if nothing bounds the update size.</li>
-          <li>If your success metric can be satisfied by a face-plant, you do not have a success metric.</li>
-        </ul>
-
-        <div class="note">
-          <div class="note-k">Why this is on my portfolio</div>
-          <p>
-            Most RL write-ups show the run that worked. This one keeps the post-mortems in the repository —
-            the 0% that was reported as 30%, the skating that was reported as walking, the training collapse
-            — because the ability to distrust your own results is the part of the job that transfers to real
-            robots. On hardware, a metric that lies costs more than a policy that underperforms.
-          </p>
-        </div>
+        <p>
+          Most RL write-ups show the run that worked. This repository keeps the post-mortems — the 0%
+          reported as 30%, the skating reported as walking, the training collapse — because
+          <strong>the ability to distrust your own results is the part that transfers to real
+          robots.</strong> On hardware, a metric that lies costs more than a policy that underperforms.
+        </p>
 
       </div>
 

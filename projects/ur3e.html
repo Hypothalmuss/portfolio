@@ -40,28 +40,15 @@
       <div class="eyebrow">Project 03 — Manipulation &amp; Safety</div>
       <h1 class="proj-title">UR3e — <em>Pick-and-Place Cell</em></h1>
       <p class="proj-tagline">
-        A Universal Robots UR3e with a Robotiq gripper, an overhead camera and a web dashboard.
-        It finds cubes on a table, works out which ones it can actually reach, refuses the ones it
-        can't, and sorts the rest into a marked drop zone.
+        A UR3e with a Robotiq gripper, an overhead camera and a web dashboard. It finds cubes, works out
+        which it can actually reach, refuses the ones it can't, and sorts the rest into a drop zone.
       </p>
 
       <div class="proj-meta" data-gh-repo="ur3e-pick-and-place">
-        <div>
-          <span class="pmeta-k">Type</span>
-          <span class="pmeta-v">Personal engineering project</span>
-        </div>
-        <div>
-          <span class="pmeta-k">Language</span>
-          <span class="pmeta-v live" data-gh="language">Python</span>
-        </div>
-        <div>
-          <span class="pmeta-k">Last commit</span>
-          <span class="pmeta-v live" data-gh="updated">recently</span>
-        </div>
-        <div>
-          <span class="pmeta-k">Stack</span>
-          <span class="pmeta-v">ROS 2 Humble · MoveIt 2 · Gazebo Classic</span>
-        </div>
+        <div><span class="pmeta-k">Type</span><span class="pmeta-v">Personal project · simulation</span></div>
+        <div><span class="pmeta-k">Language</span><span class="pmeta-v live" data-gh="language">Python</span></div>
+        <div><span class="pmeta-k">Last commit</span><span class="pmeta-v live" data-gh="updated">recently</span></div>
+        <div><span class="pmeta-k">Stack</span><span class="pmeta-v">ROS 2 Humble · MoveIt 2 · Gazebo</span></div>
       </div>
 
       <div class="proj-actions">
@@ -81,64 +68,26 @@
           <span class="dot" aria-hidden="true"></span>
         </div>
         <div class="specsheet-grid">
-          <div class="spec-row">
-            <div class="spec-k">Manipulator</div>
-            <div class="spec-v">Universal Robots UR3e, 6-DOF</div>
-          </div>
-          <div class="spec-row">
-            <div class="spec-k">End effector</div>
-            <div class="spec-v">Robotiq 2F-85 parallel gripper</div>
-          </div>
-          <div class="spec-row">
-            <div class="spec-k">Vision</div>
-            <div class="spec-v">Overhead RGB camera, colour segmentation</div>
-          </div>
-          <div class="spec-row">
-            <div class="spec-k">Planning</div>
-            <div class="spec-v">MoveIt 2 · Cartesian descent/lift paths</div>
-          </div>
-          <div class="spec-row">
-            <div class="spec-k">Behaviour</div>
-            <div class="spec-v">py_trees_ros · orchestrator state machine</div>
-          </div>
-          <div class="spec-row">
-            <div class="spec-k">Interface</div>
-            <div class="spec-v">Zero-dependency HTTP dashboard, port 8080</div>
-          </div>
-          <div class="spec-row">
-            <div class="spec-k">Safety</div>
-            <div class="spec-v">Latching e-stop · 0.0001 rad measured drift</div>
-          </div>
-          <div class="spec-row">
-            <div class="spec-k">Verification</div>
-            <div class="spec-v">~30 system tests against Gazebo ground truth</div>
-          </div>
+          <div class="spec-row"><div class="spec-k">Manipulator</div><div class="spec-v">Universal Robots UR3e, 6-DOF</div></div>
+          <div class="spec-row"><div class="spec-k">End effector</div><div class="spec-v">Robotiq 2F-85 parallel gripper</div></div>
+          <div class="spec-row"><div class="spec-k">Vision</div><div class="spec-v">Overhead RGB, colour segmentation</div></div>
+          <div class="spec-row"><div class="spec-k">Planning</div><div class="spec-v">MoveIt 2 · Cartesian descent/lift</div></div>
+          <div class="spec-row"><div class="spec-k">Behaviour</div><div class="spec-v">py_trees_ros · orchestrator FSM</div></div>
+          <div class="spec-row"><div class="spec-k">Interface</div><div class="spec-v">Zero-dependency HTTP dashboard</div></div>
+          <div class="spec-row"><div class="spec-k">Safety</div><div class="spec-v">Latching e-stop · 0.0001 rad drift</div></div>
+          <div class="spec-row"><div class="spec-k">Verification</div><div class="spec-v">~30 tests against simulator ground truth</div></div>
         </div>
       </div>
       <p class="media-cap">Runs from a bare ROS 2 Humble install — no FastAPI, no rosbridge, nothing to pip install.</p>
 
       <div class="proj-body">
 
-        <h2>Sees, decides, acts</h2>
+        <h2>The problem</h2>
         <p>
-          <strong>Sees.</strong> An overhead camera feeds a colour-segmentation pipeline that finds every
-          cube and projects it onto the table plane through the camera transform. Each cube gets an ID
-          that <em>survives the arm passing overhead</em> — which sounds like a detail until you realise
-          the orchestrator has committed to picking "cube 4" and cannot have that renamed halfway through
-          the cycle because a shadow briefly split one blob into two.
-        </p>
-        <p>
-          <strong>Decides.</strong> The table is divided into three zones by radius from the base:
-          too close, workable, too far. Cubes are classified on sight, and anything outside the workable
-          band is <em>refused rather than attempted</em>. A robot that declines an impossible task is more
-          useful than one that tries it and faults out.
-        </p>
-        <p>
-          <strong>Acts.</strong> Each cycle runs a state machine: approach, straight-line descent, grasp,
-          lift, transfer, straight-line place, release, depart. Descents and lifts are Cartesian so the
-          tool travels vertically rather than arcing sideways into the object it is reaching for. Every
-          cube not currently being picked is published to MoveIt as a collision object, so the arm plans
-          <em>around</em> the others instead of through them.
+          Build a work cell that a non-developer can drive: it should see what is on the table, decide what
+          is actually achievable, do the achievable part, and stop safely on demand. The interesting
+          constraints are not in the picking — they are in <strong>refusing work it cannot do, and stopping
+          when told.</strong>
         </p>
 
         <div class="proj-media">
@@ -148,89 +97,138 @@
           </video>
         </div>
         <p class="media-cap">
-          Full multi-cube sweep — Gazebo on the left, the operator dashboard on the right showing live state,
-          detected cubes with their reach classification, joint positions and the activity log.
+          Multi-cube sweep — Gazebo left, the operator dashboard right showing live state, detected cubes
+          with reach classification, joint positions and the activity log.
         </p>
 
-        <h2>The emergency stop — worth the whole project</h2>
-        <p>
-          This is the part I'd want to talk through in an interview, because the obvious implementation
-          does not work and the reason is instructive.
+        <h2>Architecture</h2>
+        <div class="diagram">
+          <svg viewBox="0 0 700 330" role="img" aria-labelledby="ur3e-dg-title">
+            <title id="ur3e-dg-title">The overhead camera feeds colour segmentation, which feeds a tracker assigning stable cube IDs and a zone classifier; the orchestrator state machine consumes both, publishes idle cubes to the MoveIt planning scene as collision objects, and sends trajectories to the controllers driving the UR3e and gripper. The dashboard talks to the orchestrator over JSON, and the emergency stop bypasses it to command the controller directly.</title>
+            <defs>
+              <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" class="dg-arrow" />
+              </marker>
+            </defs>
+
+            <!-- perception chain -->
+            <rect x="8"   y="150" width="94"  height="44" rx="6" class="dg-node" />
+            <text x="55"  y="169" text-anchor="middle" class="dg-label">Camera</text>
+            <text x="55"  y="182" text-anchor="middle" class="dg-sub">overhead RGB</text>
+
+            <rect x="132" y="150" width="104" height="44" rx="6" class="dg-node-a" />
+            <text x="184" y="169" text-anchor="middle" class="dg-label">Segmentation</text>
+            <text x="184" y="182" text-anchor="middle" class="dg-sub">+ table projection</text>
+
+            <rect x="266" y="98"  width="104" height="44" rx="6" class="dg-node-a" />
+            <text x="318" y="117" text-anchor="middle" class="dg-label">Tracker</text>
+            <text x="318" y="130" text-anchor="middle" class="dg-sub">stable cube IDs</text>
+
+            <rect x="266" y="202" width="104" height="44" rx="6" class="dg-node-a" />
+            <text x="318" y="221" text-anchor="middle" class="dg-label">Zone classifier</text>
+            <text x="318" y="234" text-anchor="middle" class="dg-sub">near/work/far</text>
+
+            <!-- orchestrator -->
+            <rect x="404" y="150" width="110" height="44" rx="6" class="dg-node-a" />
+            <text x="459" y="169" text-anchor="middle" class="dg-label">Orchestrator</text>
+            <text x="459" y="182" text-anchor="middle" class="dg-sub">state machine</text>
+
+            <!-- dashboard -->
+            <rect x="404" y="20"  width="110" height="44" rx="6" class="dg-node-a" />
+            <text x="459" y="39"  text-anchor="middle" class="dg-label">Dashboard</text>
+            <text x="459" y="52"  text-anchor="middle" class="dg-sub">JSON over HTTP</text>
+
+            <!-- moveit -->
+            <rect x="548" y="98"  width="106" height="44" rx="6" class="dg-node" />
+            <text x="601" y="117" text-anchor="middle" class="dg-label">MoveIt 2</text>
+            <text x="601" y="130" text-anchor="middle" class="dg-sub">planning scene</text>
+
+            <!-- controllers -->
+            <rect x="548" y="202" width="106" height="44" rx="6" class="dg-node" />
+            <text x="601" y="221" text-anchor="middle" class="dg-label">Controllers</text>
+            <text x="601" y="234" text-anchor="middle" class="dg-sub">UR3e + gripper</text>
+
+            <!-- e-stop -->
+            <rect x="404" y="278" width="110" height="40" rx="6" class="dg-node-a" />
+            <text x="459" y="295" text-anchor="middle" class="dg-label">E-stop</text>
+            <text x="459" y="308" text-anchor="middle" class="dg-sub">hold position</text>
+
+            <path d="M 102 172 H 129"                     class="dg-edge" marker-end="url(#arrow3)" />
+            <path d="M 236 165 Q 252 165 252 120 H 263"   class="dg-edge" marker-end="url(#arrow3)" />
+            <path d="M 236 179 Q 252 179 252 224 H 263"   class="dg-edge" marker-end="url(#arrow3)" />
+            <path d="M 370 120 Q 388 120 388 165 H 401"   class="dg-edge" marker-end="url(#arrow3)" />
+            <path d="M 370 224 Q 388 224 388 179 H 401"   class="dg-edge" marker-end="url(#arrow3)" />
+            <path d="M 459 148 V 68"                      class="dg-edge" marker-end="url(#arrow3)" />
+            <path d="M 514 165 Q 532 165 532 120 H 545"   class="dg-edge" marker-end="url(#arrow3)" />
+            <path d="M 601 142 V 199"                     class="dg-edge" marker-end="url(#arrow3)" />
+            <!-- e-stop bypasses the orchestrator, straight to the controller -->
+            <path d="M 514 298 H 601 V 249"               class="dg-edge" marker-end="url(#arrow3)" />
+
+            <text x="601" y="90"  text-anchor="middle" class="dg-topic">collision objects</text>
+            <text x="558" y="313" text-anchor="middle" class="dg-topic">hold command</text>
+          </svg>
+        </div>
+        <p class="media-cap">
+          Teal blocks are project code. Note the e-stop path: it goes straight to the controller rather than
+          through the orchestrator, which is the whole point.
         </p>
 
+        <h2>The challenges</h2>
+
+        <h3>Cancelling a goal does not stop an arm</h3>
         <div class="note">
-          <div class="note-k">Engineering note — cancelling isn't stopping</div>
+          <div class="note-k">The bug worth the whole project</div>
           <p>
-            Cancelling the in-flight action goals is <strong>necessary but not sufficient</strong>.
-            A trajectory that has already been handed to the controller keeps executing regardless of what
-            happens to the goal that produced it — the arm carries on for several radians while your
-            "stop" sits there having successfully cancelled nothing that matters.
+            Cancelling in-flight action goals is <strong>necessary but not sufficient.</strong> A trajectory
+            already handed to the controller keeps executing regardless of what happens to the goal that
+            produced it — the arm carries on for several radians while your "stop" successfully cancels
+            nothing that matters.
           </p>
           <p>
-            The stop also has to command the controller to <em>hold its current position</em>. That is the
-            part that actually brings the arm to rest. Measured drift after a stop: <code>0.0001 rad</code>.
+            The stop also has to command the controller to <em>hold its current position</em>. That is what
+            actually brings the arm to rest. Measured drift after a stop: <code>0.0001 rad</code>.
           </p>
         </div>
-
         <p>
-          It then <strong>latches</strong>. Every command except <code>reset</code> is refused until the
-          latch is explicitly cleared. This is deliberately a different thing from <code>stop</code>, which
-          is a tidy recovery — reopen the gripper, drive home. Tidying up is exactly the wrong response to
-          an emergency: if someone hit that button, the last thing you want is the arm helpfully travelling
-          back to its home pose through whatever caused the emergency.
+          It then latches — every command except <code>reset</code> is refused until cleared. Deliberately
+          distinct from <code>stop</code>, which is a tidy recovery that reopens the gripper and drives home.
+          Tidying up is the wrong response to an emergency: if someone hit that button, you do not want the
+          arm travelling back through whatever caused it.
         </p>
 
-        <h2>Tasks</h2>
-        <div class="proj-table-wrap">
-          <table class="proj-table">
-            <thead><tr><th>Task</th><th>What it does</th></tr></thead>
-            <tbody>
-              <tr><td><strong>tidy</strong></td><td>Sweep every reachable cube into the drop zone, one at a time</td></tr>
-              <tr><td><strong>pick_selected</strong></td><td>Same, but only the cube IDs ticked in the dashboard</td></tr>
-              <tr><td><strong>pick_to</strong></td><td>One cube to coordinates typed in by the operator</td></tr>
-              <tr><td><strong>spawn_cube</strong></td><td>Drop a new cube into a free spot in the workable zone</td></tr>
-              <tr><td><strong>home</strong> / <strong>retract</strong></td><td>Move to home, or park clear of the workspace</td></tr>
-              <tr><td><strong>stop</strong></td><td>End the cycle tidily — reopen gripper, return home</td></tr>
-              <tr><td><strong>estop</strong></td><td>Halt where it stands and latch</td></tr>
-              <tr><td><strong>reset</strong></td><td>Clear the latch, wipe the planning scene, return home</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h2>A dashboard with no dependencies</h2>
+        <h3>IDs that survive occlusion</h3>
         <p>
-          The interface is a ROS node plus Python's standard-library HTTP server. No FastAPI, no rosbridge,
-          nothing to install — it runs from a bare Humble image. The browser polls a single JSON endpoint:
+          Each cube gets an ID that persists while the arm passes overhead. That sounds like a detail until
+          the orchestrator has committed to "cube 4" and cannot have it renamed mid-cycle because a shadow
+          briefly split one blob into two. Cubes not currently being picked are published to MoveIt as
+          collision objects, so the arm plans <em>around</em> them rather than through them.
         </p>
+
+        <h3>Testing a vision system without asking the vision system</h3>
+        <p>
+          Every physical claim is verified against the simulator's own model state, never against the
+          perception pipeline — because that pipeline is one of the things under test, and a vision system
+          asked to confirm its own output will always agree with itself. That includes checking placed cubes
+          land in <em>different</em> slots, since four cubes stacked in one corner passes a naive
+          "is it in the zone" test perfectly.
+        </p>
+
+        <h2>Results</h2>
         <ul class="ticks">
-          <li><code>GET /api/state</code> — orchestrator status, every detected cube with its zone, joint positions, drop-zone target, activity feed, liveness indicators for the orchestrator and camera</li>
-          <li><code>POST /api/task</code> — <code>{"task": "tidy"}</code> or <code>{"task": "pick_selected", "ids": [2,4]}</code></li>
+          <li>Emergency stop brings the arm to rest with <strong>0.0001 rad</strong> of drift, and latches until explicitly reset.</li>
+          <li>Cube identity survives occlusion by the arm across a full multi-cube cycle.</li>
+          <li>Unreachable cubes are refused on sight rather than attempted and failed.</li>
+          <li>~30 system tests covering startup, input validation, every task, e-stop and reset — all checked against ground truth.</li>
+          <li>Operator dashboard runs from a bare Humble install with zero extra dependencies.</li>
         </ul>
-        <p>
-          Task buttons disable themselves while the robot is busy. The emergency stop never does.
-        </p>
 
-        <h2>Testing what's true, not what the code believes</h2>
+        <h2>Outcome</h2>
         <p>
-          <code>full_system_test.py</code> runs about thirty checks covering startup, input validation, every
-          task, emergency stop and reset. The design decision that matters: <strong>every physical claim is
-          verified against Gazebo's own model state, not against the perception pipeline</strong> — because
-          that pipeline is one of the things under test. A vision system asked to confirm its own output will
-          always agree with itself.
-        </p>
-        <p>
-          That includes checking that placed cubes end up in <em>different</em> slots, not merely somewhere
-          inside the drop square. Four cubes stacked in one corner satisfies a naive "is it in the zone" test
-          perfectly.
-        </p>
-
-        <h2>Grasping in Gazebo Classic, honestly</h2>
-        <p>
-          Gazebo Classic's contact solver will not reliably hold a light box in a parallel gripper. The
-          gripper does close on the cube physically, and a plugin fixes the nearest object to the tool once
-          the driver knuckle passes a threshold, releasing when the gripper reopens. The motion looks and
-          behaves like a real grasp; only the hold is plugin-assisted. Worth stating plainly — a portfolio
-          that hides its simulator's limitations is telling you something about how it reports results.
+          A cell that behaves like equipment rather than a script: it declines impossible work, it stops when
+          told and stays stopped, and it can be driven by someone who has never opened a terminal. Worth
+          stating plainly — Gazebo Classic's contact solver will not hold a light box in a parallel gripper,
+          so the grasp is physically real but the hold is plugin-assisted. A portfolio that hides its
+          simulator's limits is telling you something about how it reports results.
         </p>
 
       </div>
@@ -242,7 +240,7 @@
         </a>
         <a href="cartpole.html" class="pnav-card next">
           <div class="pnav-k">Next project →</div>
-          <div class="pnav-t">CartPole Goes Brrr — RL from Scratch</div>
+          <div class="pnav-t">CartPole Goes Brrr — RL From Scratch</div>
         </a>
       </nav>
 

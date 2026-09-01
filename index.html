@@ -109,19 +109,6 @@
           <p>I love robots, I build them.</p>
         </div>
 
-        <div class="hero-stats">
-          <div class="hstat"><span class="hstat-n">2+</span><span class="hstat-l">Years on<br/>Real Hardware</span></div>
-          <div class="hstat-sep"></div>
-          <div class="hstat"><span class="hstat-n">6+</span><span class="hstat-l">Deployed<br/>Autonomy Systems</span></div>
-          <div class="hstat-sep"></div>
-          <div class="hstat"><span class="hstat-n">3</span><span class="hstat-l">Robot<br/>Platforms</span></div>
-          <div class="hstat-sep"></div>
-          <div class="hstat">
-            <span class="hstat-n" id="hero-visitor-count">—</span>
-            <span class="hstat-l">Portfolio<br/>Visitors</span>
-          </div>
-        </div>
-
         <div class="hero-actions">
           <a href="#projects" class="btn-primary">View My Work</a>
           <a href="assets/docs/Mohamed-Nadim-Touil-CV.pdf" class="btn-secondary" download>Download CV</a>
@@ -141,8 +128,7 @@
 
         <p class="github-notice" data-gh-repo="tog-sim">
           <span class="notice-icon">◈</span>
-          Actively building — last push to
-          <a href="https://github.com/Hypothalmuss/tog-sim" target="_blank" rel="noopener"><code>tog-sim</code></a> <strong data-gh="updated">recently</strong>.
+          <span class="notice-text">Actively building — last push to <a href="https://github.com/Hypothalmuss/tog-sim" target="_blank" rel="noopener"><code>tog-sim</code></a> <strong data-gh="updated">recently</strong>.</span>
         </p>
 
       </div>
@@ -349,8 +335,8 @@
   <section id="projects" class="section">
     <div class="container">
       <div class="eyebrow">04 — Projects</div>
-      <h2 class="sh2">Things I've <em>deployed.</em></h2>
-      <p class="section-sub">Every project here ran on real hardware, or was built with real deployment as the end goal. The four flagship builds have full write-ups — architecture, benchmarks, and the bugs worth talking about.</p>
+      <h2 class="sh2">Things I've <em>developed.</em></h2>
+      <p class="section-sub">Field deployments, hardware bring-ups and simulation work. Each card says which it is. The four flagship builds have full write-ups.</p>
 
       <div class="projects-list">
 
@@ -363,7 +349,7 @@
             <div class="pcard-tag mono">UNITREE GO2 · ROS 2 · SLAM</div>
           </div>
           <div class="pcard-body">
-            <div class="pnum mono">/ 01</div>
+            <div class="pcard-head"><span class="pnum mono">/ 01</span><span class="pkind pkind-hw mono">Real hardware</span></div>
             <h3>Go2 Quadruped — Autonomous Exploration &amp; Mapping</h3>
             <p>A Unitree Go2 walks into an unmapped building, chooses its own goals from the frontier between known and unknown space, maps the whole thing, and stops when there is nothing left to explore. Built at EagleProjects for indoor survey work, then extended outdoors with GPS geofencing as a hard safety boundary.</p>
             <div class="pwins">
@@ -387,7 +373,7 @@
             <div class="pcard-tag mono">EPSON SCARA · YOLO-SEG · GAZEBO</div>
           </div>
           <div class="pcard-body">
-            <div class="pnum mono">/ 02</div>
+            <div class="pcard-head"><span class="pnum mono">/ 02</span><span class="pkind pkind-sim mono">Simulation</span></div>
             <h3>tog-sim — Vision-Guided High-Speed Pick &amp; Place</h3>
             <p>A full packaging cell inspired by the Schubert tog.519. A neural network segments unsorted products on a moving belt, a SCARA picks them with a vacuum gripper, and places them into trays that are also moving — the belts never stop. Perception trained entirely on 1,773 synthetic scenes with no manual annotation.</p>
             <div class="pwins">
@@ -415,7 +401,7 @@
             <div class="pcard-tag mono">UR3e · MOVEIT 2 · ROS 2</div>
           </div>
           <div class="pcard-body">
-            <div class="pnum mono">/ 03</div>
+            <div class="pcard-head"><span class="pnum mono">/ 03</span><span class="pkind pkind-sim mono">Simulation</span></div>
             <h3>UR3e Pick-and-Place Cell</h3>
             <p>A UR3e with a Robotiq gripper, an overhead camera and a zero-dependency web dashboard. It finds cubes, classifies which are actually reachable, refuses the ones that aren't, and sorts the rest. The emergency stop is the interesting part — cancelling action goals doesn't stop an arm, and finding that out is the whole lesson.</p>
             <div class="pwins">
@@ -443,7 +429,7 @@
             <div class="pcard-tag mono">PYBULLET · PPO · IMITATION LEARNING</div>
           </div>
           <div class="pcard-body">
-            <div class="pnum mono">/ 04</div>
+            <div class="pcard-head"><span class="pnum mono">/ 04</span><span class="pkind pkind-sim mono">Simulation</span></div>
             <h3>CartPole Goes Brrr — RL From the Ground Up</h3>
             <p>One cartpole rig, nine increasingly ridiculous jobs — balance, crawl, hop, walk, and finally imitate human motion capture at 99% success. The write-up keeps the post-mortems: the success rate that was really 0%, the "walking" that was actually skating, and PPO destroying a policy it had already learned.</p>
             <div class="pwins">
@@ -471,7 +457,7 @@
             <div class="pcard-tag mono">UNITREE G1 · MUJOCO · RL</div>
           </div>
           <div class="pcard-body">
-            <div class="pnum mono">/ 05</div>
+            <div class="pcard-head"><span class="pnum mono">/ 05</span><span class="pkind pkind-sim mono">Simulation</span></div>
             <h3>G1 Humanoid — Kung Fu Motion Learning</h3>
             <p>Reinforcement learning policies for the Unitree G1 humanoid in MuJoCo, trained to reproduce martial-arts motion sequences. The agent learns physically plausible whole-body movement from reward signal alone — groundwork for sim-to-real transfer of agile behaviours on the real G1 at EagleProjects.</p>
             <div class="pwins">
@@ -495,7 +481,7 @@
             <div class="pcard-tag mono">AUTONOMOUS VESSEL · ROS 2 · OPEN WATER</div>
           </div>
           <div class="pcard-body">
-            <div class="pnum mono">/ 06</div>
+            <div class="pcard-head"><span class="pnum mono">/ 06</span><span class="pkind pkind-hw mono">Real hardware</span></div>
             <h3>Autonomous Surface Vessel — Open Water</h3>
             <p>Built and deployed an autonomous surface vessel from scratch at the VGR Laboratory, York University, Toronto. Integrated LiDAR and camera for open-water navigation in ROS 2, with an ArUco marker-based visual docking pipeline achieving repeatable precision docking on physical hardware in real water conditions.</p>
             <div class="pwins">
@@ -519,7 +505,7 @@
             <div class="pcard-tag mono">OPENCV · ARUCO · PATH PLANNING</div>
           </div>
           <div class="pcard-body">
-            <div class="pnum mono">/ 07</div>
+            <div class="pcard-head"><span class="pnum mono">/ 07</span><span class="pkind pkind-hw mono">Real hardware</span></div>
             <h3>Clothoid Path Generation from ArUco Markers</h3>
             <p>Camera calibration through to trajectory generation: estimate the pose of an ArUco marker from live camera frames, then generate a clothoid curve from the camera's position to the marker. The curve regenerates on every movement, continuously optimising the distance left to travel — the docking approach behind the surface vessel work.</p>
             <div class="pwins">
@@ -546,7 +532,7 @@
             <div class="pcard-tag mono">STM32 · PID · COMPETITION</div>
           </div>
           <div class="pcard-body">
-            <div class="pnum mono">/ 08</div>
+            <div class="pcard-head"><span class="pnum mono">/ 08</span><span class="pkind pkind-hw mono">Real hardware</span></div>
             <h3>Competitive Autonomous Robots</h3>
             <p>Designed and built autonomous competition robots from scratch, competing in over 10 national robotics competitions. Won 1st place twice and reached the podium in 5 others. PID control, multi-sensor fusion and real-time decision logic — built under competition time pressure across line-following and full autonomous navigation categories.</p>
             <div class="pwins">

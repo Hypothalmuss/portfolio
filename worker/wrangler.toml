@@ -1,0 +1,9 @@
+name = "portfolio-counter"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+
+# Created by:  npx wrangler kv namespace create COUNTER
+# Paste the returned id below, then:  npx wrangler deploy
+[[kv_namespaces]]
+binding = "COUNTER"
+id = "PASTE_YOUR_KV_NAMESPACE_ID_HERE"

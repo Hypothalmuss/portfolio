@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CartPole Goes Brrr — Reinforcement Learning | Mohamed Nadim Touil</title>
+  <meta name="description" content="Nine PPO tasks on one cartpole rig in PyBullet — balance, crawl, hop, walk, and imitation learning from human motion capture. Includes the reward-hacking bugs found and the post-mortems." />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../project.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Epilogue:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-logo">
+        <span class="logo-bracket">[</span>NT<span class="logo-bracket">]</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../index.html#experience">Experience</a></li>
+        <li><a href="../index.html#education">Education</a></li>
+        <li><a href="../index.html#projects">Projects</a></li>
+        <li><a href="../index.html#contact" class="nav-cta">Get in Touch</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <header class="proj-hero">
+    <div class="container">
+      <a href="../index.html#projects" class="back-link">← All projects</a>
+
+      <div class="eyebrow">Project 04 — Reinforcement Learning</div>
+      <h1 class="proj-title">CartPole <em>Goes Brrr</em></h1>
+      <p class="proj-tagline">
+        One cartpole rig, nine increasingly ridiculous jobs. It starts as the textbook balance problem
+        and ends as a stick figure walking from human motion capture. The point was to learn RL properly —
+        which mostly meant learning how many ways a reward function can lie to you.
+      </p>
+
+      <div class="proj-meta" data-gh-repo="CartPole-Goes-Brrr">
+        <div>
+          <span class="pmeta-k">Type</span>
+          <span class="pmeta-v">Personal research project</span>
+        </div>
+        <div>
+          <span class="pmeta-k">Language</span>
+          <span class="pmeta-v live" data-gh="language">Python</span>
+        </div>
+        <div>
+          <span class="pmeta-k">Last commit</span>
+          <span class="pmeta-v live" data-gh="updated">recently</span>
+        </div>
+        <div>
+          <span class="pmeta-k">Stack</span>
+          <span class="pmeta-v">PyBullet · Stable-Baselines3 PPO</span>
+        </div>
+      </div>
+
+      <div class="proj-actions">
+        <a href="https://github.com/Hypothalmuss/CartPole-Goes-Brrr" target="_blank" rel="noopener" class="btn-primary">View on GitHub</a>
+        <a href="../index.html#contact" class="btn-secondary">Get in touch</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ BODY ═══ -->
+  <section class="section">
+    <div class="container">
+
+      <div class="proj-media">
+        <video autoplay loop muted playsinline preload="metadata" poster="../assets/posters/cartpole-showreel.jpg">
+          <source src="../assets/videos/cartpole-showreel.mp4" type="video/mp4" />
+          Your browser does not support HTML5 video.
+        </video>
+      </div>
+      <p class="media-cap">Showreel — the same rig, reconfigured across tasks.</p>
+
+      <div class="proj-body">
+
+        <h2>The nine tasks</h2>
+        <div class="proj-table-wrap">
+          <table class="proj-table">
+            <thead>
+              <tr><th>Task</th><th>Objective</th><th>Action space</th><th>Result</th><th>Steps</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Balance (1L)</strong></td><td>Keep the pole upright on a rail</td><td>1D force ±25 N</td><td class="num">90%</td><td>999K</td></tr>
+              <tr><td><strong>Balance (2L)</strong></td><td>Keep a double pendulum upright</td><td>1D force ±100 N</td><td class="num">63%</td><td>3M</td></tr>
+              <tr><td><strong>Crawl</strong></td><td>Drag the cart with joint torque alone</td><td>2D torque</td><td class="num">5 m/ep</td><td>1M</td></tr>
+              <tr><td><strong>Hop</strong></td><td>Gantry-constrained 2D hopping</td><td>2D torque</td><td class="num">16.9 m/ep</td><td>1M</td></tr>
+              <tr><td><strong>Legged stand</strong></td><td>Planar biped, stand still</td><td>6D torque</td><td class="num">89%</td><td>6M</td></tr>
+              <tr><td><strong>Legged walk</strong></td><td>Planar biped, walk forward</td><td>6D torque</td><td class="num">5.6 m/ep, 88%</td><td>8M</td></tr>
+              <tr><td><strong>Stickman stand</strong></td><td>Trunk, head and arms, stand still</td><td>9D torque</td><td class="num">88%</td><td>6M</td></tr>
+              <tr><td><strong>Stickman walk</strong></td><td>Full stick figure, walk forward</td><td>9D torque</td><td class="num">5.8 m/ep, 75%</td><td>8M</td></tr>
+              <tr><td><strong>Stickman mimic</strong></td><td>Imitate human motion capture</td><td>9D torque</td><td class="num">99%, 17 m/ep</td><td>8M</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Three times the reward function lied</h2>
+        <p>
+          The through-line of this project is not the policies. It is that a reward function will always find
+          the cheapest thing that satisfies it, and that "cheapest" is almost never what you meant. Each of
+          these took real debugging to find.
+        </p>
+
+        <h3>1. The success rate that was never real</h3>
+        <div class="note">
+          <div class="note-k">It wasn't 30%. It was 0%.</div>
+          <p>
+            The two-link balance task reported 30% success for a long time. It was actually zero. The
+            termination check tested an angle the pole <strong>physically could not reach</strong> —
+            <code>link1</code>'s collision geometry caught it on the floor first — so a face-plant simply ran
+            out the clock and got scored as a win.
+          </p>
+          <p>
+            Three more bugs sat underneath: penalties linear in raw Newtons that made using the actuator
+            net-negative (the agent settled on 6.6 N of a 100 N budget — it had learned that moving was a
+            mistake), an un-normalised action space, and 240 Hz control that left <code>gamma=0.99</code>
+            with just 0.42 s of effective lookahead.
+          </p>
+          <p>
+            Rebuilt with geometric tip-height termination, a normalised action space, 60 Hz control, and
+            nine reward terms collapsed into one — it now runs at a genuine <strong>63%</strong>. Of the 37
+            failures in 100 episodes, 36 are the cart running out of rail with the pole still upright.
+          </p>
+        </div>
+
+        <div class="proj-media">
+          <video autoplay loop muted playsinline preload="none" poster="../assets/posters/cartpole-crawl.jpg">
+            <source src="../assets/videos/cartpole-crawl.mp4" type="video/mp4" />
+            Your browser does not support HTML5 video.
+          </video>
+        </div>
+        <p class="media-cap">
+          The crawl task — rail removed, the pole drags the cart forward like an inchworm using its own
+          joint torques. Asymmetric friction (cart glides, tip grips) is the physical half of the trick.
+        </p>
+
+        <h3>2. "Moved forward" is not "walked"</h3>
+        <p>
+          The planar biped reached 6.4 m per episode against a random baseline of −0.02 m. It looked like
+          progress. It wasn't walking — it was <strong>skating</strong>. Both feet stayed on the ground 98%
+          of the time, the knees never left their straight hard stop, and there was more foot slip than
+          actual forward travel.
+        </p>
+        <p>
+          Forward velocity paid exactly the same whether the robot stepped or slid, and nothing in the
+          reward objected. Same shape of hole as the unreachable termination check: <em>a metric measuring
+          something adjacent to the thing you wanted</em>.
+        </p>
+
+        <h3>3. PPO destroying a working policy</h3>
+        <p>
+          The imitation run reached near-full-episode tracking at 1.1M steps, then collapsed.
+          <code>approx_kl</code> hit 100× its healthy range as the policy sharpened, and ten unguarded
+          epochs per batch kept overshooting. The final model evaluated at <strong>0%</strong> — while its
+          own 1.1M checkpoint evaluated at 80%. Run 2 added <code>target_kl</code>, learning-rate decay, and
+          dropped reward normalisation (the mimic reward is already bounded). It finished at 99% with no
+          collapse.
+        </p>
+
+        <h2>The fix that replaced seven reward terms</h2>
+        <p>
+          The walking reward lineage — slip penalties, clearance bonuses, step machines, alternation
+          discounts, overtake rules — was seven terms of hand-crafted economics, and what it bought was
+          skating, then shuffling, then a gallop.
+        </p>
+        <p>
+          The final task throws all of it away for one idea from <strong>DeepMimic</strong>: a reference
+          motion says where every joint should be at every phase of the gait, and the reward is simply
+          closeness to it. <em>"Walk like this"</em> instead of <em>"move forward without doing any of the
+          nine things we thought of"</em>.
+        </p>
+        <p>
+          The reference is CMU motion capture of a human walking, retargeted through forward kinematics,
+          sagittal projection, the URDF's joint conventions, Froude time scaling for legs 0.8× human length,
+          and a root height solved on the robot's own foot geometry so the reference never floats or clips
+          the floor. The body needed rebuilding for it too — the ankle moved to a third of the way along a
+          longer foot (a centred foot has no toe-off lever) and mass ratios corrected to human proportions
+          (v1 carried 16% of its mass in the trunk and head; a human carries about 45%).
+        </p>
+
+        <div class="proj-media">
+          <video autoplay loop muted playsinline preload="none" poster="../assets/posters/cartpole-mimic.jpg">
+            <source src="../assets/videos/cartpole-mimic.mp4" type="video/mp4" />
+            Your browser does not support HTML5 video.
+          </video>
+        </div>
+        <p class="media-cap">
+          The mimic pipeline end to end — CMU's capture, the human skeleton, the retargeted reference,
+          and the policy running in real physics, phase-locked.
+        </p>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-n">99<span class="unit">%</span></div>
+            <div class="metric-l">episodes completing the full 16.7 s</div>
+          </div>
+          <div class="metric">
+            <div class="metric-n">32</div>
+            <div class="metric-l">alternating steps/ep (reference predicts 33)</div>
+          </div>
+          <div class="metric">
+            <div class="metric-n">13<span class="unit">%</span></div>
+            <div class="metric-l">foot slip, down from the skater's 199%</div>
+          </div>
+          <div class="metric">
+            <div class="metric-n">0.97<span class="unit">m/s</span></div>
+            <div class="metric-l">against the reference's 1.18 m/s</div>
+          </div>
+        </div>
+
+        <p>
+          The part that matters: <strong>none of those sub-behaviours are named in the reward.</strong>
+          Step alternation, 4.3 cm swing clearance, 85% single support, the collapse in foot slip — all of
+          it falls out of "match the reference", and all of it had previously resisted seven hand-written
+          terms trying to buy it directly.
+        </p>
+
+        <h2>Constraint as curriculum</h2>
+        <p>
+          Two tasks use a gantry — passive, frictionless prismatic rails that lock out rotation and sideways
+          drift. This is the same approach real hopping research used (the Raibert hopper, the MIT Leg Lab):
+          a boom that constrains the problem to 2D so you can study hopping dynamics without simultaneously
+          solving 3D balance.
+        </p>
+        <p>
+          The rails never push, brake, or script the cart's trajectory — it moves purely from foot-ground
+          contact forces. The agent still has to learn a genuine compress–extend–flight–land cycle. It just
+          doesn't have to learn not to fall sideways at the same time. <strong>A constraint that removes a
+          sub-problem is a curriculum tool, not a cheat</strong> — as long as you say which one it is.
+        </p>
+
+        <div class="proj-media">
+          <video autoplay loop muted playsinline preload="none" poster="../assets/posters/cartpole-hop.jpg">
+            <source src="../assets/videos/cartpole-hop.mp4" type="video/mp4" />
+            Your browser does not support HTML5 video.
+          </video>
+        </div>
+        <p class="media-cap">
+          The gantry-constrained hopper — a genuine compress, extend, flight, land cycle at
+          16.9 m per episode. The rails prevent tipping; they never provide propulsion.
+        </p>
+
+        <h2>What this project actually taught</h2>
+        <ul class="ticks">
+          <li>Diagnostics before hyperparameters. Every real gain here came from finding a broken measurement, not from a better learning rate.</li>
+          <li>One geometric quantity beats nine hand-weighted terms — tip height replaced a per-joint cosine reward that was happily paying for a folded pose.</li>
+          <li>Some behaviours cannot be specified in reward terms, only demonstrated.</li>
+          <li>PPO can destroy a working policy as efficiently as it builds one if nothing bounds the update size.</li>
+          <li>If your success metric can be satisfied by a face-plant, you do not have a success metric.</li>
+        </ul>
+
+        <div class="note">
+          <div class="note-k">Why this is on my portfolio</div>
+          <p>
+            Most RL write-ups show the run that worked. This one keeps the post-mortems in the repository —
+            the 0% that was reported as 30%, the skating that was reported as walking, the training collapse
+            — because the ability to distrust your own results is the part of the job that transfers to real
+            robots. On hardware, a metric that lies costs more than a policy that underperforms.
+          </p>
+        </div>
+
+      </div>
+
+      <nav class="proj-nav">
+        <a href="ur3e.html" class="pnav-card">
+          <div class="pnav-k">← Previous</div>
+          <div class="pnav-t">UR3e Pick-and-Place Cell</div>
+        </a>
+        <a href="../index.html#projects" class="pnav-card next">
+          <div class="pnav-k">Back to →</div>
+          <div class="pnav-t">All projects</div>
+        </a>
+      </nav>
+
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <div class="container footer-row">
+      <a href="../index.html" class="nav-logo"><span class="logo-bracket">[</span>NT<span class="logo-bracket">]</span></a>
+      <p>© 2025 Mohamed Nadim Touil — Built with HTML · CSS · JS — Hosted on GitHub Pages</p>
+      <div class="footer-links">
+        <a href="../index.html">Home</a>
+        <a href="https://github.com/hypothalmuss" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://linkedin.com/in/MedNadimTouil" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+      <div class="footer-visitor">
+        <span class="footer-visitor-dot"></span>
+        <span id="footer-visitor-count">—</span> visitors
+      </div>
+    </div>
+  </footer>
+
+  <script src="../script.js"></script>
+  <script src="../visitor.js"></script>
+  <script src="../github-activity.js"></script>
+</body>
+</html>

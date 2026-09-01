@@ -65,51 +65,32 @@ const observer = new IntersectionObserver(entries => {
 revealEls.forEach(el => observer.observe(el));
 
 
-// ── 5. VIDEO — robust preload & fallback ──────────────────────────────────
-document.querySelectorAll('.pcard-media video').forEach(video => {
-  // Ensure video tries to load on page ready
-  if (video.readyState === 0) {
-    video.load();
-  }
+// ── 5. VIDEO ─ lazy playback, poster until needed ───────────────────
+// Every video carries a poster frame, so nothing needs to download until it is
+// either on screen (autoplay clips) or the visitor presses play (controls clips).
+document.querySelectorAll('video[poster]').forEach(video => {
+  const autoplays = video.hasAttribute('autoplay');
 
-  // Preload more aggressively when card enters viewport
-  const card = video.closest('.pcard');
-  const videoObserver = new IntersectionObserver(entries => {
+  const io = new IntersectionObserver(entries => {
     entries.forEach(entry => {
+      if (!autoplays) return;
+      // Looping demo clips play only while visible — saves bandwidth and CPU.
       if (entry.isIntersecting) {
-        video.preload = 'auto';
-        video.load();
-        videoObserver.unobserve(entry.target);
+        video.play().catch(() => { /* autoplay blocked — poster stands */ });
+      } else {
+        video.pause();
       }
     });
-  }, { threshold: 0.1 });
+  }, { threshold: 0.25 });
 
-  if (card) videoObserver.observe(card);
+  io.observe(video);
 
-  // Show a placeholder if video fails to load
+  // If a source is missing or fails, leave the poster in place rather than a
+  // broken player, and drop the controls so it reads as an image.
   video.addEventListener('error', () => {
-    const wrapper = video.closest('.pcard-media');
-    if (!wrapper) return;
-    if (!wrapper.querySelector('.video-error')) {
-      const msg = document.createElement('div');
-      msg.className = 'video-error';
-      msg.style.cssText = `
-        position:absolute; inset:0; z-index:3;
-        display:flex; flex-direction:column;
-        align-items:center; justify-content:center;
-        background:var(--bg-alt);
-        font-family:var(--f-mono); font-size:0.75rem;
-        color:var(--text-dim); text-align:center; padding:1.5rem;
-        gap:0.5rem;
-      `;
-      msg.innerHTML = `
-        <span style="font-size:1.75rem">🎬</span>
-        <span>Demo video coming soon</span>
-        <span style="font-size:0.65rem;opacity:0.6">Add your .mp4 to assets/videos/</span>
-      `;
-      wrapper.appendChild(msg);
-    }
-  });
+    video.removeAttribute('controls');
+    video.classList.add('video-fallback');
+  }, true);
 });
 
 

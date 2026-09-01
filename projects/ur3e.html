@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UR3e Pick-and-Place Cell | Mohamed Nadim Touil</title>
+  <meta name="description" content="A UR3e work cell in ROS 2 Humble and MoveIt 2: camera-driven cube detection with stable IDs, reach-zone classification, a Cartesian pick state machine, and an emergency stop that actually stops the arm." />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../project.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Epilogue:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-logo">
+        <span class="logo-bracket">[</span>NT<span class="logo-bracket">]</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../index.html#experience">Experience</a></li>
+        <li><a href="../index.html#education">Education</a></li>
+        <li><a href="../index.html#projects">Projects</a></li>
+        <li><a href="../index.html#contact" class="nav-cta">Get in Touch</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <header class="proj-hero">
+    <div class="container">
+      <a href="../index.html#projects" class="back-link">← All projects</a>
+
+      <div class="eyebrow">Project 03 — Manipulation &amp; Safety</div>
+      <h1 class="proj-title">UR3e — <em>Pick-and-Place Cell</em></h1>
+      <p class="proj-tagline">
+        A Universal Robots UR3e with a Robotiq gripper, an overhead camera and a web dashboard.
+        It finds cubes on a table, works out which ones it can actually reach, refuses the ones it
+        can't, and sorts the rest into a marked drop zone.
+      </p>
+
+      <div class="proj-meta" data-gh-repo="ur3e-pick-and-place">
+        <div>
+          <span class="pmeta-k">Type</span>
+          <span class="pmeta-v">Personal engineering project</span>
+        </div>
+        <div>
+          <span class="pmeta-k">Language</span>
+          <span class="pmeta-v live" data-gh="language">Python</span>
+        </div>
+        <div>
+          <span class="pmeta-k">Last commit</span>
+          <span class="pmeta-v live" data-gh="updated">recently</span>
+        </div>
+        <div>
+          <span class="pmeta-k">Stack</span>
+          <span class="pmeta-v">ROS 2 Humble · MoveIt 2 · Gazebo Classic</span>
+        </div>
+      </div>
+
+      <div class="proj-actions">
+        <a href="https://github.com/Hypothalmuss/ur3e-pick-and-place" target="_blank" rel="noopener" class="btn-primary">View on GitHub</a>
+        <a href="../index.html#contact" class="btn-secondary">Get in touch</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ BODY ═══ -->
+  <section class="section">
+    <div class="container">
+
+      <div class="specsheet">
+        <div class="specsheet-head">
+          <span>Cell Specification</span>
+          <span class="dot" aria-hidden="true"></span>
+        </div>
+        <div class="specsheet-grid">
+          <div class="spec-row">
+            <div class="spec-k">Manipulator</div>
+            <div class="spec-v">Universal Robots UR3e, 6-DOF</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-k">End effector</div>
+            <div class="spec-v">Robotiq 2F-85 parallel gripper</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-k">Vision</div>
+            <div class="spec-v">Overhead RGB camera, colour segmentation</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-k">Planning</div>
+            <div class="spec-v">MoveIt 2 · Cartesian descent/lift paths</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-k">Behaviour</div>
+            <div class="spec-v">py_trees_ros · orchestrator state machine</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-k">Interface</div>
+            <div class="spec-v">Zero-dependency HTTP dashboard, port 8080</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-k">Safety</div>
+            <div class="spec-v">Latching e-stop · 0.0001 rad measured drift</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-k">Verification</div>
+            <div class="spec-v">~30 system tests against Gazebo ground truth</div>
+          </div>
+        </div>
+      </div>
+      <p class="media-cap">Runs from a bare ROS 2 Humble install — no FastAPI, no rosbridge, nothing to pip install.</p>
+
+      <div class="proj-body">
+
+        <h2>Sees, decides, acts</h2>
+        <p>
+          <strong>Sees.</strong> An overhead camera feeds a colour-segmentation pipeline that finds every
+          cube and projects it onto the table plane through the camera transform. Each cube gets an ID
+          that <em>survives the arm passing overhead</em> — which sounds like a detail until you realise
+          the orchestrator has committed to picking "cube 4" and cannot have that renamed halfway through
+          the cycle because a shadow briefly split one blob into two.
+        </p>
+        <p>
+          <strong>Decides.</strong> The table is divided into three zones by radius from the base:
+          too close, workable, too far. Cubes are classified on sight, and anything outside the workable
+          band is <em>refused rather than attempted</em>. A robot that declines an impossible task is more
+          useful than one that tries it and faults out.
+        </p>
+        <p>
+          <strong>Acts.</strong> Each cycle runs a state machine: approach, straight-line descent, grasp,
+          lift, transfer, straight-line place, release, depart. Descents and lifts are Cartesian so the
+          tool travels vertically rather than arcing sideways into the object it is reaching for. Every
+          cube not currently being picked is published to MoveIt as a collision object, so the arm plans
+          <em>around</em> the others instead of through them.
+        </p>
+
+        <div class="proj-media">
+          <video controls preload="none" playsinline muted poster="../assets/posters/ur3e-full-demo.jpg">
+            <source src="../assets/videos/ur3e-full-demo.mp4" type="video/mp4" />
+            Your browser does not support HTML5 video.
+          </video>
+        </div>
+        <p class="media-cap">
+          Full multi-cube sweep — Gazebo on the left, the operator dashboard on the right showing live state,
+          detected cubes with their reach classification, joint positions and the activity log.
+        </p>
+
+        <h2>The emergency stop — worth the whole project</h2>
+        <p>
+          This is the part I'd want to talk through in an interview, because the obvious implementation
+          does not work and the reason is instructive.
+        </p>
+
+        <div class="note">
+          <div class="note-k">Engineering note — cancelling isn't stopping</div>
+          <p>
+            Cancelling the in-flight action goals is <strong>necessary but not sufficient</strong>.
+            A trajectory that has already been handed to the controller keeps executing regardless of what
+            happens to the goal that produced it — the arm carries on for several radians while your
+            "stop" sits there having successfully cancelled nothing that matters.
+          </p>
+          <p>
+            The stop also has to command the controller to <em>hold its current position</em>. That is the
+            part that actually brings the arm to rest. Measured drift after a stop: <code>0.0001 rad</code>.
+          </p>
+        </div>
+
+        <p>
+          It then <strong>latches</strong>. Every command except <code>reset</code> is refused until the
+          latch is explicitly cleared. This is deliberately a different thing from <code>stop</code>, which
+          is a tidy recovery — reopen the gripper, drive home. Tidying up is exactly the wrong response to
+          an emergency: if someone hit that button, the last thing you want is the arm helpfully travelling
+          back to its home pose through whatever caused the emergency.
+        </p>
+
+        <h2>Tasks</h2>
+        <div class="proj-table-wrap">
+          <table class="proj-table">
+            <thead><tr><th>Task</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr><td><strong>tidy</strong></td><td>Sweep every reachable cube into the drop zone, one at a time</td></tr>
+              <tr><td><strong>pick_selected</strong></td><td>Same, but only the cube IDs ticked in the dashboard</td></tr>
+              <tr><td><strong>pick_to</strong></td><td>One cube to coordinates typed in by the operator</td></tr>
+              <tr><td><strong>spawn_cube</strong></td><td>Drop a new cube into a free spot in the workable zone</td></tr>
+              <tr><td><strong>home</strong> / <strong>retract</strong></td><td>Move to home, or park clear of the workspace</td></tr>
+              <tr><td><strong>stop</strong></td><td>End the cycle tidily — reopen gripper, return home</td></tr>
+              <tr><td><strong>estop</strong></td><td>Halt where it stands and latch</td></tr>
+              <tr><td><strong>reset</strong></td><td>Clear the latch, wipe the planning scene, return home</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>A dashboard with no dependencies</h2>
+        <p>
+          The interface is a ROS node plus Python's standard-library HTTP server. No FastAPI, no rosbridge,
+          nothing to install — it runs from a bare Humble image. The browser polls a single JSON endpoint:
+        </p>
+        <ul class="ticks">
+          <li><code>GET /api/state</code> — orchestrator status, every detected cube with its zone, joint positions, drop-zone target, activity feed, liveness indicators for the orchestrator and camera</li>
+          <li><code>POST /api/task</code> — <code>{"task": "tidy"}</code> or <code>{"task": "pick_selected", "ids": [2,4]}</code></li>
+        </ul>
+        <p>
+          Task buttons disable themselves while the robot is busy. The emergency stop never does.
+        </p>
+
+        <h2>Testing what's true, not what the code believes</h2>
+        <p>
+          <code>full_system_test.py</code> runs about thirty checks covering startup, input validation, every
+          task, emergency stop and reset. The design decision that matters: <strong>every physical claim is
+          verified against Gazebo's own model state, not against the perception pipeline</strong> — because
+          that pipeline is one of the things under test. A vision system asked to confirm its own output will
+          always agree with itself.
+        </p>
+        <p>
+          That includes checking that placed cubes end up in <em>different</em> slots, not merely somewhere
+          inside the drop square. Four cubes stacked in one corner satisfies a naive "is it in the zone" test
+          perfectly.
+        </p>
+
+        <h2>Grasping in Gazebo Classic, honestly</h2>
+        <p>
+          Gazebo Classic's contact solver will not reliably hold a light box in a parallel gripper. The
+          gripper does close on the cube physically, and a plugin fixes the nearest object to the tool once
+          the driver knuckle passes a threshold, releasing when the gripper reopens. The motion looks and
+          behaves like a real grasp; only the hold is plugin-assisted. Worth stating plainly — a portfolio
+          that hides its simulator's limitations is telling you something about how it reports results.
+        </p>
+
+      </div>
+
+      <nav class="proj-nav">
+        <a href="tog-sim.html" class="pnav-card">
+          <div class="pnav-k">← Previous</div>
+          <div class="pnav-t">tog-sim — Vision-Guided Pick &amp; Place</div>
+        </a>
+        <a href="cartpole.html" class="pnav-card next">
+          <div class="pnav-k">Next project →</div>
+          <div class="pnav-t">CartPole Goes Brrr — RL from Scratch</div>
+        </a>
+      </nav>
+
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <div class="container footer-row">
+      <a href="../index.html" class="nav-logo"><span class="logo-bracket">[</span>NT<span class="logo-bracket">]</span></a>
+      <p>© 2025 Mohamed Nadim Touil — Built with HTML · CSS · JS — Hosted on GitHub Pages</p>
+      <div class="footer-links">
+        <a href="../index.html">Home</a>
+        <a href="https://github.com/hypothalmuss" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://linkedin.com/in/MedNadimTouil" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+      <div class="footer-visitor">
+        <span class="footer-visitor-dot"></span>
+        <span id="footer-visitor-count">—</span> visitors
+      </div>
+    </div>
+  </footer>
+
+  <script src="../script.js"></script>
+  <script src="../visitor.js"></script>
+  <script src="../github-activity.js"></script>
+</body>
+</html>

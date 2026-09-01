@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tog-sim — Vision-Guided High-Speed Pick &amp; Place | Mohamed Nadim Touil</title>
+  <meta name="description" content="A packaging cobot cell in ROS 2 Humble and Gazebo Fortress: YOLO11n-seg perception, an Epson GX8 SCARA, vacuum picking from moving conveyors at 13–14.5 picks per minute with millimetre placement." />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../project.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Epilogue:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-logo">
+        <span class="logo-bracket">[</span>NT<span class="logo-bracket">]</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../index.html#experience">Experience</a></li>
+        <li><a href="../index.html#education">Education</a></li>
+        <li><a href="../index.html#projects">Projects</a></li>
+        <li><a href="../index.html#contact" class="nav-cta">Get in Touch</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <header class="proj-hero">
+    <div class="container">
+      <a href="../index.html#projects" class="back-link">← All projects</a>
+
+      <div class="eyebrow">Project 02 — Industrial Manipulation</div>
+      <h1 class="proj-title">tog-sim — <em>Vision-Guided Pick &amp; Place</em></h1>
+      <p class="proj-tagline">
+        A full packaging cell: a neural network segments unsorted products on a moving belt, a SCARA
+        picks them with a vacuum gripper, and places them into trays that are also moving — the belts
+        never stop. Built as an open re-interpretation of a Schubert tog.519.
+      </p>
+
+      <div class="proj-meta" data-gh-repo="tog-sim">
+        <div>
+          <span class="pmeta-k">Type</span>
+          <span class="pmeta-v">Personal engineering project</span>
+        </div>
+        <div>
+          <span class="pmeta-k">Language</span>
+          <span class="pmeta-v live" data-gh="language">Python</span>
+        </div>
+        <div>
+          <span class="pmeta-k">Last commit</span>
+          <span class="pmeta-v live" data-gh="updated">recently</span>
+        </div>
+        <div>
+          <span class="pmeta-k">Status</span>
+          <span class="pmeta-v">M0–M5 complete · M6 in progress</span>
+        </div>
+      </div>
+
+      <div class="proj-actions">
+        <a href="https://github.com/Hypothalmuss/tog-sim" target="_blank" rel="noopener" class="btn-primary">View on GitHub</a>
+        <a href="../index.html#contact" class="btn-secondary">Get in touch</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ BODY ═══ -->
+  <section class="section">
+    <div class="container">
+
+      <!-- Spec sheet -->
+      <div class="specsheet">
+        <div class="specsheet-head">
+          <span>Cell Specification</span>
+          <span class="dot" aria-hidden="true"></span>
+        </div>
+        <div class="specsheet-grid">
+          <div class="spec-row">
+            <div class="spec-k">Manipulator</div>
+            <div class="spec-v">Epson GX8-C653S SCARA + tilt module (5th axis)</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-k">End effector</div>
+            <div class="spec-v">OnRobot VGC10 vacuum gripper</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-k">Vision</div>
+            <div class="spec-v">2 × Intel RealSense D435, overhead</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-k">Middleware</div>
+            <div class="spec-v">ROS 2 Humble · ros2_control</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-k">Simulator</div>
+            <div class="spec-v">Gazebo Fortress · Open-RMF workcell</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-k">Perception model</div>
+            <div class="spec-v">YOLO11n-seg, trained on synthetic data</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-k">Motion</div>
+            <div class="spec-v">Analytical IK · Ruckig trajectory generation</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-k">Operator HMI</div>
+            <div class="spec-v">FastAPI + vanilla JS control panel</div>
+          </div>
+        </div>
+      </div>
+      <p class="media-cap">Every component modelled is off-the-shelf hardware you could actually buy and build.</p>
+
+      <div class="proj-body">
+
+        <h2>Why this is hard</h2>
+        <p>
+          The naive version of pick and place is easy: stop the belt, look, pick, place, restart.
+          Every second of stopped belt is lost throughput, so real packaging machines never do that.
+          They pick from a belt that is still moving, into a tray that is <em>also</em> still moving,
+          which means the robot is aiming at two independently moving targets and has to arrive at a
+          point neither of them has reached yet.
+        </p>
+        <p>
+          On top of that the products arrive unsorted and unoriented. There is no fixture telling the
+          robot where anything is — perception has to supply the grasp pose, the product class, and
+          which tray pockets are still empty.
+        </p>
+
+        <div class="proj-media">
+          <img src="../assets/images/togsim-setup.png" alt="The tog-sim cell in Gazebo Fortress: an Epson GX8 SCARA with tilt module and VGC10 suction cup between an infeed belt carrying products and an outfeed belt carrying trays, with two overhead D435 cameras inside an Open-RMF enclosure." loading="lazy" />
+        </div>
+        <p class="media-cap">
+          The cell: SCARA with tilt module and suction cup between the infeed belt (products) and outfeed
+          belt (trays), two overhead D435s, Open-RMF enclosure — all in Gazebo Fortress.
+        </p>
+
+        <div class="proj-media">
+          <video autoplay loop muted playsinline preload="metadata" poster="../assets/posters/togsim-speed.jpg">
+            <source src="../assets/videos/togsim-speed.mp4" type="video/mp4" />
+            Your browser does not support HTML5 video.
+          </video>
+        </div>
+        <p class="media-cap">
+          Cartons only at 60 products/min on the <code>fast</code> motion profile, vision perception live
+          from Gazebo — continuous pick and place from <em>moving</em> belts, no stops.
+        </p>
+
+        <h2>Results</h2>
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-n">120<span class="unit">/120</span></div>
+            <div class="metric-l">cartons placed, no belt stops</div>
+          </div>
+          <div class="metric">
+            <div class="metric-n">13–14.5<span class="unit">cpm</span></div>
+            <div class="metric-l">sustained picks per minute</div>
+          </div>
+          <div class="metric">
+            <div class="metric-n">2.7–3.7<span class="unit">mm</span></div>
+            <div class="metric-l">mean placement error (95% CI)</div>
+          </div>
+          <div class="metric">
+            <div class="metric-n">0.98</div>
+            <div class="metric-l">mask mAP50, YOLO11n-seg</div>
+          </div>
+        </div>
+
+        <p>
+          Perception was validated against Gazebo's own ground truth rather than against itself —
+          class accuracy <span class="mono">1.00</span>, grasp height within
+          <span class="mono">0.4 mm</span>, yaw within <span class="mono">0.8°</span>, tray pose within
+          <span class="mono">4 mm / 0.05°</span>. The pocket clearance is 5 mm per side, so a 2.7 mm
+          mean placement error is the difference between a product seating and a product jamming.
+        </p>
+
+        <div class="proj-table-wrap">
+          <table class="proj-table">
+            <thead>
+              <tr><th>Milestone</th><th>Scope</th><th>Outcome</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>M0</strong></td><td>Packages, robot description, analytical IK, CI</td><td class="num">complete</td></tr>
+              <tr><td><strong>M1</strong></td><td>Conveyors, products, trays, ros2_control in Gazebo</td><td class="num">complete</td></tr>
+              <tr><td><strong>M2</strong></td><td>First closed loop, ground-truth perception</td><td class="num">12/12 cycles</td></tr>
+              <tr><td><strong>M3</strong></td><td>1,773 synthetic scenes → YOLO11n-seg</td><td class="num">mAP50 0.98</td></tr>
+              <tr><td><strong>M4</strong></td><td>Moving-belt tracking + speed benchmark</td><td class="num">120/120</td></tr>
+              <tr><td><strong>M5</strong></td><td>Operator HMI — recipes, alarms, e-stop, history</td><td class="num">complete</td></tr>
+              <tr><td><strong>M6</strong></td><td>Polish, teach-in, stereo, Docker</td><td>in progress</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Training a network with no real data</h2>
+        <p>
+          There is no dataset of Schubert packaging cells, so the perception model was trained entirely on
+          data the simulator generated: <strong>1,773 synthetic scenes</strong>, a third of them containing
+          bar-style trays, rendered with panoptic segmentation cameras that hand back pixel-perfect labels
+          for free. No manual annotation at any point.
+        </p>
+        <p>
+          The resulting YOLO11n-seg model reaches 0.98 mask mAP50 — and more usefully, when its outputs are
+          compared to ground truth on the metrics that actually matter downstream (is the class right, is
+          the grasp height right, is the yaw right), it is accurate to well under a millimetre.
+        </p>
+
+        <div class="note">
+          <div class="note-k">Engineering note — the one-line bug that eats a week</div>
+          <p>
+            Ultralytics treats NumPy images as <strong>BGR</strong>. ROS publishes <code>rgb8</code>.
+            Feed a ROS frame straight into inference and the model sees every product in the wrong colour
+            space — it still detects things, just badly and inconsistently, which is far harder to diagnose
+            than an outright failure. The nodes now convert explicitly before inference, and the training
+            PNGs are written as BGR to match.
+          </p>
+        </div>
+
+        <h2>Picking off a moving belt</h2>
+        <p>
+          The <code>conveyor_tracker</code> node turns per-frame detections into stable tracks for both
+          products and trays, and publishes each as a TF frame. That single design choice is what makes
+          the rest tractable: once a moving product is a coordinate frame, the motion planner can aim at
+          <em>where it will be</em> rather than where it was seen, and the pick becomes a normal
+          transform lookup instead of a special case.
+        </p>
+        <p>
+          On top of that sits a <code>TRACK_CART</code> motion mode that flies, tracks and seals against a
+          target in motion. Each cycle runs as four phases — <code>schedule</code> (what is pickable now and
+          where can it go), <code>pick</code> (which also measures the grasp offset it actually achieved),
+          <code>choose_pocket</code>, and place — so the tray decision is revisited <em>after</em> the pick
+          with knowledge of how the product actually sits in the gripper.
+        </p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 700 250" role="img" aria-labelledby="tog-dg-title">
+            <title id="tog-dg-title">tog-sim data flow: two RealSense cameras feed YOLO segmentation, which produces grasp poses and tray vacancy; the conveyor tracker publishes TF frames consumed by the task scheduler, which drives motion through Ruckig and analytical IK to the SCARA.</title>
+            <defs>
+              <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" class="dg-arrow" />
+              </marker>
+            </defs>
+
+            <rect x="8"   y="98" width="96" height="46" rx="6" class="dg-node" />
+            <text x="56"  y="118" text-anchor="middle" class="dg-label">2× D435</text>
+            <text x="56"  y="132" text-anchor="middle" class="dg-sub">overhead</text>
+
+            <rect x="140" y="98" width="110" height="46" rx="6" class="dg-node-a" />
+            <text x="195" y="118" text-anchor="middle" class="dg-label">YOLO11n-seg</text>
+            <text x="195" y="132" text-anchor="middle" class="dg-sub">masks + class</text>
+
+            <rect x="288" y="35"  width="110" height="46" rx="6" class="dg-node-a" />
+            <text x="343" y="55"  text-anchor="middle" class="dg-label">Grasp pose</text>
+            <text x="343" y="69"  text-anchor="middle" class="dg-sub">+ tray vacancy</text>
+
+            <rect x="288" y="160" width="110" height="46" rx="6" class="dg-node-a" />
+            <text x="343" y="180" text-anchor="middle" class="dg-label">Conveyor</text>
+            <text x="343" y="194" text-anchor="middle" class="dg-sub">tracker → TF</text>
+
+            <rect x="436" y="98" width="110" height="46" rx="6" class="dg-node-a" />
+            <text x="491" y="118" text-anchor="middle" class="dg-label">Task cycle</text>
+            <text x="491" y="132" text-anchor="middle" class="dg-sub">TRACK_CART</text>
+
+            <rect x="582" y="98" width="108" height="46" rx="6" class="dg-node" />
+            <text x="636" y="118" text-anchor="middle" class="dg-label">Ruckig + IK</text>
+            <text x="636" y="132" text-anchor="middle" class="dg-sub">SCARA + VGC10</text>
+
+            <path d="M 104 121 H 137"                    class="dg-edge" marker-end="url(#arrow2)" />
+            <path d="M 250 114 Q 270 114 270 58 H 285"   class="dg-edge" marker-end="url(#arrow2)" />
+            <path d="M 250 128 Q 270 128 270 183 H 285"  class="dg-edge" marker-end="url(#arrow2)" />
+            <path d="M 398 58  Q 420 58 420 114 H 433"   class="dg-edge" marker-end="url(#arrow2)" />
+            <path d="M 398 183 Q 420 183 420 128 H 433"  class="dg-edge" marker-end="url(#arrow2)" />
+            <path d="M 546 121 H 579"                    class="dg-edge" marker-end="url(#arrow2)" />
+
+            <text x="120" y="112" text-anchor="middle" class="dg-topic">rgb8</text>
+            <text x="564" y="112" text-anchor="middle" class="dg-topic">traj</text>
+          </svg>
+        </div>
+        <p class="media-cap">Teal blocks are project code; the SCARA controller and simulator are the surrounding infrastructure.</p>
+
+        <div class="proj-media">
+          <video autoplay loop muted playsinline preload="none" poster="../assets/posters/togsim-mixed.jpg">
+            <source src="../assets/videos/togsim-mixed.mp4" type="video/mp4" />
+            Your browser does not support HTML5 video.
+          </video>
+        </div>
+        <p class="media-cap">
+          Mixed run — cartons and bars at 30 products/min across two tray models on the outfeed. Every
+          product class routes to a tray that fits it; 8/8 cycles at 4.4–4.5 mm mean, no tray disturbed.
+        </p>
+
+        <h2>Benchmarking like it matters</h2>
+        <p>
+          Robotics demos are easy to cherry-pick, so the numbers here come from a harness rather than a
+          good run. <code>bench.sh</code> executes seeded repeats and writes one JSON per run — cycles,
+          attempts, picks per minute, motion time, placement mean and p95 against ground truth, a
+          per-phase timeline, and failures. <code>bench_report.py</code> then aggregates them with
+          <strong>95% confidence intervals</strong>: Wilson intervals for success rate, bootstrap over
+          cycles for picks-per-minute, bootstrap over placed products for placement error.
+        </p>
+        <p>
+          The table regenerates from data; only the interpretation is written by hand. Tuning parameters
+          live in versioned YAML alongside <em>the rationale for each</em> — including the levers that were
+          tried and rejected, which is usually the more useful half.
+        </p>
+
+        <h2>Operator-facing, not just demo-facing</h2>
+        <p>
+          M5 added <code>togsim_hmi</code>: a FastAPI + vanilla-JS panel with status, belt control, recipes,
+          start/stop/e-stop, alarms with explicit acknowledgement, health indicators, run history and live
+          tray occupancy. It exists because a cell that only a developer can start is not a cell — the
+          question "what is it doing and how do I stop it" has to have an answer that isn't a terminal.
+        </p>
+
+        <h2>A detail I'm quietly proud of</h2>
+        <p>
+          tog-sim runs on its own <code>ROS_DOMAIN_ID</code> (42 by default). Another Gazebo instance on the
+          same machine or LAN publishes <code>/clock</code> too, and if it mixes with yours you get a
+          simulation whose time jumps — a bug that presents as inexplicable motion glitches and takes days
+          to trace. Isolating the domain by default makes that class of failure impossible rather than rare.
+        </p>
+
+      </div>
+
+      <!-- Prev / next -->
+      <nav class="proj-nav">
+        <a href="go2.html" class="pnav-card">
+          <div class="pnav-k">← Previous</div>
+          <div class="pnav-t">Go2 Quadruped — Autonomous Exploration</div>
+        </a>
+        <a href="ur3e.html" class="pnav-card next">
+          <div class="pnav-k">Next project →</div>
+          <div class="pnav-t">UR3e Pick-and-Place Cell</div>
+        </a>
+      </nav>
+
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <div class="container footer-row">
+      <a href="../index.html" class="nav-logo"><span class="logo-bracket">[</span>NT<span class="logo-bracket">]</span></a>
+      <p>© 2025 Mohamed Nadim Touil — Built with HTML · CSS · JS — Hosted on GitHub Pages</p>
+      <div class="footer-links">
+        <a href="../index.html">Home</a>
+        <a href="https://github.com/hypothalmuss" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://linkedin.com/in/MedNadimTouil" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+      <div class="footer-visitor">
+        <span class="footer-visitor-dot"></span>
+        <span id="footer-visitor-count">—</span> visitors
+      </div>
+    </div>
+  </footer>
+
+  <script src="../script.js"></script>
+  <script src="../visitor.js"></script>
+  <script src="../github-activity.js"></script>
+</body>
+</html>

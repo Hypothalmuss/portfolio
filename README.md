@@ -11,7 +11,7 @@ Edit a file, commit, push; Pages deploys it.
 ```
 index.html              Home — hero, about, experience, education, projects, contact
 projects/
-  go2.html              Go2 quadruped — autonomous exploration & mapping
+  go2.html              Unitree quadruped fleet — autonomy stack & simulator
   tog-sim.html          Vision-guided high-speed pick & place cell
   ur3e.html             UR3e pick-and-place cell
   cartpole.html         CartPole Goes Brrr — reinforcement learning

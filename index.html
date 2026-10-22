@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mohamed Nadim Touil — Robotics Software Engineer</title>
-  <meta name="description" content="Robotics Software Engineer specializing in ROS 2, autonomous navigation, reinforcement learning, and real-hardware deployment on legged robots." />
+  <meta name="description" content="Robotics Software Engineer building ROS 2 autonomy and simulation for legged robots, with autonomy code in production on a commercial quadruped fleet." />
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,7 +12,7 @@
   <link rel="canonical" href="https://hypothalmuss.github.io/portfolio/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Mohamed Nadim Touil — Robotics Software Engineer" />
-  <meta property="og:description" content="ROS 2, autonomous navigation, reinforcement learning, and real-hardware deployment on legged robots and manipulators." />
+  <meta property="og:description" content="ROS 2 autonomy and simulation for legged robots, manipulation, reinforcement learning, and hardware deployment on marine and ground robots." />
   <meta property="og:url" content="https://hypothalmuss.github.io/portfolio/" />
   <meta property="og:image" content="https://hypothalmuss.github.io/portfolio/assets/images/profile.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -158,11 +158,11 @@
         </div>
         <div class="about-right">
           <p>I'm a Robotics Software Engineer with solid hands-on experience taking autonomous systems from ROS 2 codebase to field deployment on physical robots. My core value: if it doesn't run on the actual machine, it doesn't count.</p>
-          <p>Currently at <strong>EagleProjects Tunisia</strong>, I work on the full autonomy stack for the <strong>Unitree Go2</strong> quadruped and <strong>G1 humanoid</strong> — navigation, obstacle avoidance, GPS localization, geofencing, and RL-based control. Before that, I deployed an autonomous surface vessel at <strong>York University</strong>, Toronto.</p>
+          <p>Currently at <strong>EagleProjects Tunisia</strong>, I build the ROS 2 autonomy stack for a client fleet of about 45 <strong>Unitree quadrupeds</strong> — autonomous exploration, reactive obstacle avoidance, mission planning, and the Gazebo simulator clients use to validate missions before hardware. I also train <strong>G1 humanoid</strong> motion-imitation policies. Before that, I deployed an autonomous surface vessel at <strong>York University</strong>, Toronto.</p>
           <p>I'm looking for <strong>robotics software engineering roles worldwide</strong> — at companies building real products: AMRs, legged robots, industrial automation, field robotics, or manipulation systems.</p>
           <div class="about-pills">
             <span>✓ Full ROS 2 stack ownership</span>
-            <span>✓ Sim-to-real RL deployment</span>
+            <span>✓ Autonomy code in production on a robot fleet</span>
             <span>✓ Real hardware, not just simulation</span>
             <span>✓ Open to relocation worldwide</span>
           </div>
@@ -187,10 +187,16 @@
             <div class="tl-accent-bar"></div>
             <h3>Robotics &amp; AI Software Engineer</h3>
             <p class="tl-company mono">EagleProjects Tunisia — Tunis, Tunisia</p>
-            <p class="tl-desc">Own the autonomy stack for the Go2 quadruped — SLAM and navigation pipelines in ROS 2, frontier-based autonomous exploration, and GPS geofencing. Also train reinforcement learning controllers for locomotion on the G1 humanoid.</p>
+            <p class="tl-desc">ROS 2 autonomy stack for a client fleet of about 45 Unitree quadrupeds, with hardware deployment by the Italian team. Features run on Go2, B2 and B2W; A2 and A2W support is in progress.</p>
+            <ul class="tl-points">
+              <li>Frontier-based autonomous exploration as a ROS 2 service — 8-neighbour frontier detection, KD-tree clustering, distance-vs-size medoid scoring. A 7-min run covered 58 m across 8 frontier goals in sim.</li>
+              <li>LiDAR reactive obstacle avoidance as ROS 2 actions — rotate-then-wall-follow and lateral-slide strategies, with live obstacle injection into the A* planner for local replanning.</li>
+              <li>Gazebo simulator for Go2, A2, A2W, B2 and B2W with a bridge layer mirroring the real Unitree topic interface, so the production stack runs unchanged. Clients use it to validate missions before hardware.</li>
+              <li>G1 motion-imitation policies trained from video with the open-source PBHC pipeline (IsaacGym, PPO; MuJoCo sim2sim); hardware deployment handled by the partner team.</li>
+            </ul>
             <div class="chips">
-              <span>ROS 2</span><span>MuJoCo</span><span>RL</span><span>Python</span>
-              <span>Unitree Go2</span><span>Unitree G1</span><span>GPS</span><span>LiDAR</span>
+              <span>ROS 2</span><span>Python</span><span>Gazebo</span><span>LiDAR</span><span>A*</span>
+              <span>Unitree Go2 / B2 / B2W</span><span>Unitree G1</span><span>IsaacGym</span><span>PPO</span>
             </div>
           </div>
         </div>
@@ -204,7 +210,7 @@
             <div class="tl-accent-bar"></div>
             <h3>ROS &amp; Robotics Mentor <span class="badge-sm">Part-time</span></h3>
             <p class="tl-company mono">Graine d'Entrepreneur — Tunis, Tunisia</p>
-            <p class="tl-desc">Mentored interns on ROS 1 and ROS 2, sensor integration, and building autonomous systems end to end.</p>
+            <p class="tl-desc">Coached interns through end-to-end ROS 1/2 autonomous systems: sensor integration, URDF modeling, and navigation stack configuration.</p>
             <div class="chips">
               <span>ROS 1/2</span><span>URDF</span><span>Nav2</span><span>SLAM</span>
             </div>
@@ -220,7 +226,7 @@
             <div class="tl-accent-bar"></div>
             <h3>Robotics Engineering Intern</h3>
             <p class="tl-company mono">VGR Laboratory, York University — Toronto, Canada</p>
-            <p class="tl-desc">Built an autonomous surface vessel in ROS 2 integrating LiDAR and camera, with ArUco-based visual docking and trajectory planning for repeatable precision docking on the water.</p>
+            <p class="tl-desc">Built and deployed an autonomous surface vessel in ROS 2 on physical hardware, integrating LiDAR and camera for open-water navigation. Implemented ArUco-based visual docking with clothoid trajectory planning: repeatable docking at 20% and 50% thrust, with the failure envelope characterized at 80%.</p>
             <div class="chips">
               <span>ROS 2</span><span>LiDAR</span><span>OpenCV</span><span>ArUco</span>
               <span>Nav2</span><span>SLAM</span><span>Python</span><span>Trajectory Planning</span>
@@ -336,30 +342,65 @@
     <div class="container">
       <div class="eyebrow">04 — Projects</div>
       <h2 class="sh2">Things I've <em>developed.</em></h2>
-      <p class="section-sub">Field deployments, hardware bring-ups and simulation work. Each card says which it is. The four flagship builds have full write-ups.</p>
+      <p class="section-sub">Production autonomy, field deployments and simulation work. Each card says which it is. The flagship builds have full write-ups.</p>
 
       <div class="projects-list">
 
-        <!-- P1 — Go2 Exploration -->
+        <!-- P1 — Unitree fleet autonomy (EagleProjects) -->
         <article class="pcard reveal">
-          <div class="pcard-media">
-            <video controls preload="none" playsinline muted poster="assets/posters/go2-nav.jpg">
-              <source src="assets/videos/go2-nav.mp4" type="video/mp4" />
-            </video>
-            <div class="pcard-tag mono">UNITREE GO2 · ROS 2 · SLAM</div>
+          <div class="pcard-media dual">
+            <div class="media-frame">
+              <video controls preload="none" playsinline muted poster="assets/posters/go2-nav.jpg">
+                <source src="assets/videos/go2-nav.mp4" type="video/mp4" />
+              </video>
+              <div class="pcard-tag mono">AUTONOMOUS EXPLORATION · GO2</div>
+            </div>
+            <div class="media-frame">
+              <video controls preload="none" playsinline muted poster="assets/posters/b2w-mission-planning.jpg">
+                <source src="assets/videos/b2w-mission-planning.mp4" type="video/mp4" />
+              </video>
+              <div class="pcard-tag mono">MISSION PLANNING · B2W</div>
+            </div>
           </div>
           <div class="pcard-body">
-            <div class="pcard-head"><span class="pnum mono">/ 01</span><span class="pkind pkind-hw mono">Real hardware</span></div>
-            <h3>Go2 Quadruped — Autonomous Exploration &amp; Mapping</h3>
-            <p>A Unitree Go2 walks into an unmapped building, chooses its own goals from the frontier between known and unknown space, maps the whole thing, and stops when there is nothing left to explore. Built at EagleProjects for indoor survey work, then extended outdoors with GPS geofencing as a hard safety boundary.</p>
+            <div class="pcard-head"><span class="pnum mono">/ 01</span><span class="pkind pkind-hw mono">Production fleet</span></div>
+            <h3>Unitree Quadruped Fleet — ROS 2 Autonomy &amp; Simulation</h3>
+            <p>The autonomy stack behind a client fleet of about 45 Unitree quadrupeds, built at EagleProjects. The robot picks its own exploration goals in unmapped space, avoids obstacles reactively, and runs planned missions — all validated first in a Gazebo simulator that mirrors the real Unitree topic interface, so the production stack runs unchanged. Every feature supports Go2, B2 and B2W; A2 and A2W support is in progress.</p>
             <div class="pwins">
-              <span>✦ Frontier-based autonomous goal selection</span>
-              <span>✦ 2D occupancy + OctoMap 3D volumetric mapping</span>
-              <span>✦ GPS geofencing enforced independently of the planner</span>
+              <span>✦ Frontier exploration: 58 m across 8 goals in a 7-min sim run</span>
+              <span>✦ LiDAR reactive avoidance with live A* replanning</span>
+              <span>✦ Gazebo sim for Go2, A2, A2W, B2, B2W — stack runs unchanged</span>
             </div>
-            <div class="pstack"><span>ROS 2</span><span>Python</span><span>SLAM</span><span>Nav2</span><span>OctoMap</span><span>Unitree Go2</span></div>
+            <div class="pstack"><span>ROS 2</span><span>Python</span><span>Gazebo</span><span>LiDAR</span><span>A*</span><span>Unitree SDK2</span></div>
             <div class="plinks">
               <a href="projects/go2.html" class="link-btn link-btn-primary">Read the full story →</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- P2 — hand-teleop -->
+        <article class="pcard reveal">
+          <div class="pcard-media">
+            <video controls preload="none" playsinline muted poster="assets/posters/hand-teleop.jpg">
+              <source src="assets/videos/hand-teleop.mp4" type="video/mp4" />
+            </video>
+            <div class="pcard-tag mono">UR5e · MEDIAPIPE · C++ DIFF IK</div>
+          </div>
+          <div class="pcard-body">
+            <div class="pcard-head"><span class="pnum mono">/ 02</span><span class="pkind pkind-sim mono">Simulation</span></div>
+            <h3>hand-teleop — Webcam Hand Teleoperation</h3>
+            <p>Drive a UR5e + Robotiq 2F-85 with nothing but a webcam and your hands. MediaPipe tracks both hands, a clutch mapping turns the right hand into a Cartesian target and a left-hand pinch into grip, and a 200 Hz C++ differential IK controller on MuJoCo Jacobians moves the arm — no MoveIt, no teleop hardware.</p>
+            <div class="pwins">
+              <span>✦ 20/20 live pick-and-place</span>
+              <span>✦ 62 ms median camera-to-command latency</span>
+              <span>✦ 5.1 mm RMS tracking error</span>
+            </div>
+            <div class="pstack"><span>ROS 2 Humble</span><span>MuJoCo</span><span>MediaPipe</span><span>C++</span><span>Python</span></div>
+            <div class="plinks">
+              <a href="https://github.com/Hypothalmuss/hand-teleop" target="_blank" rel="noopener" class="link-btn">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                Code
+              </a>
             </div>
           </div>
         </article>
@@ -373,15 +414,15 @@
             <div class="pcard-tag mono">EPSON SCARA · YOLO-SEG · GAZEBO</div>
           </div>
           <div class="pcard-body">
-            <div class="pcard-head"><span class="pnum mono">/ 02</span><span class="pkind pkind-sim mono">Simulation</span></div>
+            <div class="pcard-head"><span class="pnum mono">/ 03</span><span class="pkind pkind-sim mono">Simulation</span></div>
             <h3>tog-sim — Vision-Guided High-Speed Pick &amp; Place</h3>
             <p>A full packaging cell inspired by the Schubert tog.519. A neural network segments unsorted products on a moving belt, a SCARA picks them with a vacuum gripper, and places them into trays that are also moving — the belts never stop. Perception trained entirely on 1,773 synthetic scenes with no manual annotation.</p>
             <div class="pwins">
-              <span>✦ 120/120 cartons placed, no belt stops</span>
-              <span>✦ 13–14.5 picks/min, 2.7–3.7 mm placement error</span>
-              <span>✦ YOLO11n-seg at 0.98 mask mAP50, fully synthetic training</span>
+              <span>✦ 80/80 success, picking from moving belts</span>
+              <span>✦ 12–14 picks/min, 2.7 mm mean placement</span>
+              <span>✦ YOLO11-seg at 0.98 mask mAP50, fully synthetic training</span>
             </div>
-            <div class="pstack"><span>ROS 2 Humble</span><span>Gazebo Fortress</span><span>YOLO11</span><span>Ruckig</span><span>FastAPI</span></div>
+            <div class="pstack"><span>ROS 2 Humble</span><span>Gazebo Fortress</span><span>YOLO11-seg</span><span>Ruckig</span><span>FastAPI</span></div>
             <div class="plinks">
               <a href="projects/tog-sim.html" class="link-btn link-btn-primary">Read the full story →</a>
               <a href="https://github.com/Hypothalmuss/tog-sim" target="_blank" rel="noopener" class="link-btn">
@@ -401,7 +442,7 @@
             <div class="pcard-tag mono">UR3e · MOVEIT 2 · ROS 2</div>
           </div>
           <div class="pcard-body">
-            <div class="pcard-head"><span class="pnum mono">/ 03</span><span class="pkind pkind-sim mono">Simulation</span></div>
+            <div class="pcard-head"><span class="pnum mono">/ 04</span><span class="pkind pkind-sim mono">Simulation</span></div>
             <h3>UR3e Pick-and-Place Cell</h3>
             <p>A UR3e with a Robotiq gripper, an overhead camera and a zero-dependency web dashboard. It finds cubes, classifies which are actually reachable, refuses the ones that aren't, and sorts the rest. The emergency stop is the interesting part — cancelling action goals doesn't stop an arm, and finding that out is the whole lesson.</p>
             <div class="pwins">
@@ -426,18 +467,18 @@
             <video autoplay loop muted playsinline preload="none" poster="assets/posters/cartpole-showreel.jpg">
               <source src="assets/videos/cartpole-showreel.mp4" type="video/mp4" />
             </video>
-            <div class="pcard-tag mono">PYBULLET · PPO · IMITATION LEARNING</div>
+            <div class="pcard-tag mono">PYBULLET · PPO · REWARD SHAPING</div>
           </div>
           <div class="pcard-body">
-            <div class="pcard-head"><span class="pnum mono">/ 04</span><span class="pkind pkind-sim mono">Simulation</span></div>
+            <div class="pcard-head"><span class="pnum mono">/ 05</span><span class="pkind pkind-sim mono">Simulation</span></div>
             <h3>CartPole Goes Brrr — RL From the Ground Up</h3>
-            <p>One cartpole rig, nine increasingly ridiculous jobs — balance, crawl, hop, walk, and finally imitate human motion capture at 99% success. The write-up keeps the post-mortems: the success rate that was really 0%, the "walking" that was actually skating, and PPO destroying a policy it had already learned.</p>
+            <p>A four-task PPO curriculum on one physics rig, driven by reward shaping only: cartpole balance, double-pendulum balance, an inchworm crawl, and gantry-constrained hopping. The write-up keeps the post-mortems — including the success rate that was really 0% until the termination check was fixed.</p>
             <div class="pwins">
-              <span>✦ 99% success on mocap imitation, 17 m per episode</span>
-              <span>✦ One reference motion replaced seven hand-tuned reward terms</span>
-              <span>✦ Every reward-hacking bug documented, not hidden</span>
+              <span>✦ Cartpole and double-pendulum balance on one rig</span>
+              <span>✦ Inchworm crawl at 5 m per episode</span>
+              <span>✦ Gantry hopping at 16.9 m per episode</span>
             </div>
-            <div class="pstack"><span>PyBullet</span><span>Stable-Baselines3</span><span>PPO</span><span>DeepMimic</span><span>Python</span></div>
+            <div class="pstack"><span>PyBullet</span><span>Gymnasium</span><span>Stable-Baselines3</span><span>PPO</span><span>Python</span></div>
             <div class="plinks">
               <a href="projects/cartpole.html" class="link-btn link-btn-primary">Read the full story →</a>
               <a href="https://github.com/Hypothalmuss/CartPole-Goes-Brrr" target="_blank" rel="noopener" class="link-btn">
@@ -454,18 +495,18 @@
             <video controls preload="none" playsinline muted poster="assets/posters/g1-kungfu-mujoco.jpg">
               <source src="assets/videos/g1-kungfu-mujoco.mp4" type="video/mp4" />
             </video>
-            <div class="pcard-tag mono">UNITREE G1 · MUJOCO · RL</div>
+            <div class="pcard-tag mono">UNITREE G1 · PBHC · ISAACGYM · MUJOCO</div>
           </div>
           <div class="pcard-body">
-            <div class="pcard-head"><span class="pnum mono">/ 05</span><span class="pkind pkind-sim mono">Simulation</span></div>
-            <h3>G1 Humanoid — Kung Fu Motion Learning</h3>
-            <p>Reinforcement learning policies for the Unitree G1 humanoid in MuJoCo, trained to reproduce martial-arts motion sequences. The agent learns physically plausible whole-body movement from reward signal alone — groundwork for sim-to-real transfer of agile behaviours on the real G1 at EagleProjects.</p>
+            <div class="pcard-head"><span class="pnum mono">/ 06</span><span class="pkind pkind-sim mono">Simulation</span></div>
+            <h3>G1 Humanoid — Motion Imitation From Video</h3>
+            <p>Motion-imitation policies for the Unitree G1 humanoid at EagleProjects, trained from video with the open-source PBHC pipeline: a PPO policy trained in IsaacGym to track the reference motion, then validated sim2sim in MuJoCo before hand-off. Hardware deployment is handled by the partner team.</p>
             <div class="pwins">
-              <span>✦ Physically plausible martial-arts motion from RL</span>
-              <span>✦ Whole-body control on a 23-DOF humanoid</span>
-              <span>✦ Foundation for sim-to-real agile locomotion</span>
+              <span>✦ Martial-arts motion learned from a video reference</span>
+              <span>✦ IsaacGym training, MuJoCo sim2sim validation</span>
+              <span>✦ Whole-body control on the G1 humanoid</span>
             </div>
-            <div class="pstack"><span>MuJoCo</span><span>Python</span><span>RL</span><span>Unitree G1</span></div>
+            <div class="pstack"><span>PBHC</span><span>IsaacGym</span><span>PPO</span><span>MuJoCo</span><span>Unitree G1</span></div>
             <div class="plinks">
               <a href="#contact" class="link-btn">Ask me about this →</a>
             </div>
@@ -481,13 +522,13 @@
             <div class="pcard-tag mono">AUTONOMOUS VESSEL · ROS 2 · OPEN WATER</div>
           </div>
           <div class="pcard-body">
-            <div class="pcard-head"><span class="pnum mono">/ 06</span><span class="pkind pkind-hw mono">Real hardware</span></div>
+            <div class="pcard-head"><span class="pnum mono">/ 07</span><span class="pkind pkind-hw mono">Real hardware</span></div>
             <h3>Autonomous Surface Vessel — Open Water</h3>
-            <p>Built and deployed an autonomous surface vessel from scratch at the VGR Laboratory, York University, Toronto. Integrated LiDAR and camera for open-water navigation in ROS 2, with an ArUco marker-based visual docking pipeline achieving repeatable precision docking on physical hardware in real water conditions.</p>
+            <p>Built and deployed an autonomous surface vessel in ROS 2 at the VGR Laboratory, York University, Toronto. Integrated LiDAR and camera for open-water navigation, with ArUco-based visual docking driven by clothoid trajectory planning — run on physical hardware in real water conditions.</p>
             <div class="pwins">
               <span>✦ Real open-water field deployment</span>
-              <span>✦ Repeatable precision visual docking</span>
-              <span>✦ Full sensor pipeline built from scratch</span>
+              <span>✦ Repeatable docking at 20% and 50% thrust</span>
+              <span>✦ Failure envelope characterized at 80% thrust</span>
             </div>
             <div class="pstack"><span>ROS 2</span><span>LiDAR</span><span>OpenCV</span><span>ArUco</span><span>Python</span></div>
             <div class="plinks">
@@ -505,7 +546,7 @@
             <div class="pcard-tag mono">OPENCV · ARUCO · PATH PLANNING</div>
           </div>
           <div class="pcard-body">
-            <div class="pcard-head"><span class="pnum mono">/ 07</span><span class="pkind pkind-hw mono">Real hardware</span></div>
+            <div class="pcard-head"><span class="pnum mono">/ 08</span><span class="pkind pkind-hw mono">Real hardware</span></div>
             <h3>Clothoid Path Generation from ArUco Markers</h3>
             <p>Camera calibration through to trajectory generation: estimate the pose of an ArUco marker from live camera frames, then generate a clothoid curve from the camera's position to the marker. The curve regenerates on every movement, continuously optimising the distance left to travel — the docking approach behind the surface vessel work.</p>
             <div class="pwins">
@@ -529,16 +570,16 @@
             <video controls preload="none" playsinline muted poster="assets/posters/competition-demo.jpg">
               <source src="assets/videos/competition-demo.mp4" type="video/mp4" />
             </video>
-            <div class="pcard-tag mono">STM32 · PID · COMPETITION</div>
+            <div class="pcard-tag mono">LINE FOLLOWERS · PID · 2022 — PRESENT</div>
           </div>
           <div class="pcard-body">
-            <div class="pcard-head"><span class="pnum mono">/ 08</span><span class="pkind pkind-hw mono">Real hardware</span></div>
+            <div class="pcard-head"><span class="pnum mono">/ 09</span><span class="pkind pkind-hw mono">Real hardware</span></div>
             <h3>Competitive Autonomous Robots</h3>
-            <p>Designed and built autonomous competition robots from scratch, competing in over 10 national robotics competitions. Won 1st place twice and reached the podium in 5 others. PID control, multi-sensor fusion and real-time decision logic — built under competition time pressure across line-following and full autonomous navigation categories.</p>
+            <p>PID line-followers designed and built from scratch for national robotics competitions, with sensor fusion and real-time decision logic — tuned under competition time pressure.</p>
             <div class="pwins">
-              <span>✦ 10+ national competitions entered</span>
-              <span>✦ 2× 1st place · 5× podium finishes</span>
-              <span>✦ Multiple robot categories built from scratch</span>
+              <span>✦ One 1st place in national competitions</span>
+              <span>✦ Three 2nd places</span>
+              <span>✦ Sensor fusion and real-time decision logic</span>
             </div>
             <div class="pstack"><span>C++</span><span>STM32</span><span>ESP32</span><span>PID</span><span>Sensor Fusion</span></div>
             <div class="plinks">

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Go2 Quadruped — Autonomous Exploration &amp; Mapping | Mohamed Nadim Touil</title>
-  <meta name="description" content="Frontier-based autonomous exploration, SLAM and GPS geofencing for the Unitree Go2 quadruped in ROS 2 — built at EagleProjects for indoor survey work, extended outdoors." />
+  <title>Unitree Quadruped Fleet — Autonomy &amp; Simulation | Mohamed Nadim Touil</title>
+  <meta name="description" content="ROS 2 autonomy stack for a client fleet of about 45 Unitree quadrupeds — frontier-based exploration, LiDAR reactive obstacle avoidance, mission planning, and a Gazebo simulator mirroring the real Unitree interface. Built at EagleProjects." />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../project.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -38,17 +38,19 @@
       <a href="../index.html#projects" class="back-link">← All projects</a>
 
       <div class="eyebrow">Project 01 — Legged Autonomy</div>
-      <h1 class="proj-title">Go2 Quadruped — <em>Autonomous Exploration</em></h1>
+      <h1 class="proj-title">Unitree Quadruped Fleet — <em>Autonomy &amp; Simulation</em></h1>
       <p class="proj-tagline">
-        A Unitree Go2 walks into a building it has never seen, chooses its own goals, maps the space,
-        and stops when there is nothing left to explore. No operator, no prior map, no waypoints.
+        The ROS 2 autonomy stack for a client fleet of about 45 Unitree quadrupeds. The robot explores
+        space it has never seen, reacts to obstacles the map didn't have, and runs planned missions —
+        and every one of those behaviours is proven in simulation before it reaches a robot.
       </p>
 
       <div class="proj-meta">
         <div><span class="pmeta-k">Role</span><span class="pmeta-v">Robotics &amp; AI Software Engineer</span></div>
         <div><span class="pmeta-k">Where</span><span class="pmeta-v">EagleProjects Tunisia</span></div>
         <div><span class="pmeta-k">Timeline</span><span class="pmeta-v">May 2025 — present</span></div>
-        <div><span class="pmeta-k">Platform</span><span class="pmeta-v live">Unitree Go2 · real hardware</span></div>
+        <div><span class="pmeta-k">Platforms</span><span class="pmeta-v live">Go2 · B2 · B2W</span></div>
+        <div><span class="pmeta-k">In progress</span><span class="pmeta-v">A2 · A2W</span></div>
       </div>
 
       <div class="proj-actions">
@@ -67,14 +69,14 @@
           <span class="dot" aria-hidden="true"></span>
         </div>
         <div class="specsheet-grid">
-          <div class="spec-row"><div class="spec-k">Robot</div><div class="spec-v">Unitree Go2 quadruped</div></div>
+          <div class="spec-row"><div class="spec-k">Robots</div><div class="spec-v">Unitree Go2, B2, B2W · A2, A2W in progress</div></div>
+          <div class="spec-row"><div class="spec-k">Fleet</div><div class="spec-v">~45 client robots, deployed by the Italian team</div></div>
           <div class="spec-row"><div class="spec-k">Middleware</div><div class="spec-v">ROS 2 Humble · Python</div></div>
-          <div class="spec-row"><div class="spec-k">Perception</div><div class="spec-v">3D LiDAR · depth camera · IMU · GPS</div></div>
-          <div class="spec-row"><div class="spec-k">Mapping</div><div class="spec-v">2D occupancy SLAM + OctoMap 3D</div></div>
-          <div class="spec-row"><div class="spec-k">Navigation</div><div class="spec-v">Nav2 · custom path follower</div></div>
-          <div class="spec-row"><div class="spec-k">Exploration</div><div class="spec-v">Frontier-based goal selection</div></div>
-          <div class="spec-row"><div class="spec-k">Safety</div><div class="spec-v">GPS geofence, enforced outside the planner</div></div>
-          <div class="spec-row"><div class="spec-k">Environments</div><div class="spec-v">Indoor rooms &amp; corridors, extended outdoors</div></div>
+          <div class="spec-row"><div class="spec-k">Perception</div><div class="spec-v">3D LiDAR · odometry · occupancy grid</div></div>
+          <div class="spec-row"><div class="spec-k">Exploration</div><div class="spec-v">Frontier-based, exposed as a ROS 2 service</div></div>
+          <div class="spec-row"><div class="spec-k">Avoidance</div><div class="spec-v">LiDAR reactive, exposed as ROS 2 actions</div></div>
+          <div class="spec-row"><div class="spec-k">Planning</div><div class="spec-v">A* with live obstacle injection · mission goals</div></div>
+          <div class="spec-row"><div class="spec-k">Simulator</div><div class="spec-v">Gazebo + bridge mirroring the Unitree topics</div></div>
         </div>
       </div>
       <p class="media-cap">Hardware is off-the-shelf. The autonomy stack on top of it is the work.</p>
@@ -83,83 +85,124 @@
 
         <h2>The problem</h2>
         <p>
-          Survey work: send a quadruped into a space and get back a map, plus the confidence that it never
-          walked anywhere it shouldn't have. That rules out teleoperation, and it rules out pre-planned
-          waypoint routes — <strong>you cannot plan waypoints through a building you have not mapped
+          Clients send a quadruped into a site and expect it to come back with a map, or to run a mission
+          they planned from a desk. That rules out teleoperation, and for exploration it rules out
+          pre-planned routes too — <strong>you cannot plan waypoints through a building you have not mapped
           yet.</strong> The robot has to choose its own goals from what it has seen so far.
         </p>
+        <p>
+          The second constraint is distance. The robots are deployed by the Italian team, across five
+          Unitree models, so nothing can be debugged by walking over to the robot. The code has to be
+          right before it ships, which makes the simulator part of the product rather than a convenience.
+        </p>
 
-        <div class="proj-media">
-          <video controls preload="none" playsinline muted poster="../assets/posters/go2-nav.jpg">
-            <source src="../assets/videos/go2-nav.mp4" type="video/mp4" />
-            Your browser does not support HTML5 video.
-          </video>
+        <div class="media-pair">
+          <figure>
+            <div class="proj-media">
+              <video controls preload="none" playsinline muted poster="../assets/posters/go2-nav.jpg">
+                <source src="../assets/videos/go2-nav.mp4" type="video/mp4" />
+                Your browser does not support HTML5 video.
+              </video>
+            </div>
+            <figcaption class="media-cap">
+              <strong>Autonomous exploration · Go2.</strong> Run at 4× — Gazebo left, RViz showing the
+              occupancy grid filling in as the robot picks its own frontier goals.
+            </figcaption>
+          </figure>
+          <figure>
+            <div class="proj-media">
+              <video controls preload="none" playsinline muted poster="../assets/posters/b2w-mission-planning.jpg">
+                <source src="../assets/videos/b2w-mission-planning.mp4" type="video/mp4" />
+                Your browser does not support HTML5 video.
+              </video>
+            </div>
+            <figcaption class="media-cap">
+              <strong>Mission planning · B2W.</strong> Run at 4× — mission goals queued from RViz and
+              executed by the wheeled-legged B2W in Gazebo.
+            </figcaption>
+          </figure>
         </div>
         <p class="media-cap">
-          Exploration run at 4× — Gazebo left, RViz showing the occupancy grid filling in as the robot
-          picks its own frontier goals.
+          Two features, two robots, one stack: exploration, avoidance and mission planning all run on
+          Go2, B2 and B2W. A2 and A2W support is in progress.
         </p>
 
         <h2>Architecture</h2>
         <p>
-          A loop, not a pipeline. The mission manager sits above everything, deciding whether the current
-          goal is still worth pursuing, and the geofence vetoes anything leaving the permitted polygon
-          regardless of what the planner wants.
+          A loop, not a pipeline. Exploration and mission planning both produce goals for the same A*
+          planner; reactive avoidance runs beneath it and feeds what it sees straight back into the plan.
+          Everything talks to the robot through the Unitree topic interface — which is exactly what the
+          simulator bridge reproduces.
         </p>
 
         <div class="diagram">
           <svg viewBox="0 0 700 300" role="img" aria-labelledby="go2-dg-title">
-            <title id="go2-dg-title">Sensors feed SLAM; SLAM feeds the frontier explorer and mission manager; those command Nav2 and the path follower, gated by the geofence before reaching the robot base, with new observations closing the loop.</title>
+            <title id="go2-dg-title">LiDAR and odometry feed mapping; the map feeds the frontier explorer service and the mission planner, which both send goals to the A* planner; reactive avoidance actions inject obstacles into the planner; commands go through the Unitree topic interface to either a real robot or the Gazebo simulator bridge, with new observations closing the loop.</title>
             <defs>
               <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                 <path d="M 0 0 L 10 5 L 0 10 z" class="dg-arrow" />
               </marker>
             </defs>
 
-            <rect x="10"  y="120" width="105" height="46" rx="6" class="dg-node" />
-            <text x="62"  y="140" text-anchor="middle" class="dg-label">Sensors</text>
-            <text x="62"  y="154" text-anchor="middle" class="dg-sub">LiDAR · IMU · GPS</text>
+            <rect x="10"  y="120" width="100" height="46" rx="6" class="dg-node" />
+            <text x="60"  y="140" text-anchor="middle" class="dg-label">Sensors</text>
+            <text x="60"  y="154" text-anchor="middle" class="dg-sub">LiDAR · odom</text>
 
-            <rect x="155" y="120" width="105" height="46" rx="6" class="dg-node" />
-            <text x="207" y="140" text-anchor="middle" class="dg-label">SLAM</text>
-            <text x="207" y="154" text-anchor="middle" class="dg-sub">grid + OctoMap</text>
+            <rect x="140" y="120" width="100" height="46" rx="6" class="dg-node" />
+            <text x="190" y="140" text-anchor="middle" class="dg-label">Mapping</text>
+            <text x="190" y="154" text-anchor="middle" class="dg-sub">occupancy grid</text>
 
-            <rect x="300" y="55"  width="115" height="46" rx="6" class="dg-node-a" />
-            <text x="357" y="75"  text-anchor="middle" class="dg-label">Frontier</text>
-            <text x="357" y="89"  text-anchor="middle" class="dg-sub">explorer</text>
+            <rect x="275" y="40"  width="115" height="46" rx="6" class="dg-node-a" />
+            <text x="332" y="60"  text-anchor="middle" class="dg-label">Frontier</text>
+            <text x="332" y="74"  text-anchor="middle" class="dg-sub">explorer · service</text>
 
-            <rect x="300" y="185" width="115" height="46" rx="6" class="dg-node-a" />
-            <text x="357" y="205" text-anchor="middle" class="dg-label">Mission</text>
-            <text x="357" y="219" text-anchor="middle" class="dg-sub">manager</text>
+            <rect x="275" y="200" width="115" height="46" rx="6" class="dg-node-a" />
+            <text x="332" y="220" text-anchor="middle" class="dg-label">Mission</text>
+            <text x="332" y="234" text-anchor="middle" class="dg-sub">planner · goals</text>
 
-            <rect x="455" y="120" width="105" height="46" rx="6" class="dg-node" />
-            <text x="507" y="140" text-anchor="middle" class="dg-label">Nav2 +</text>
-            <text x="507" y="154" text-anchor="middle" class="dg-sub">path follower</text>
+            <rect x="425" y="120" width="100" height="46" rx="6" class="dg-node-a" />
+            <text x="475" y="140" text-anchor="middle" class="dg-label">A* planner</text>
+            <text x="475" y="154" text-anchor="middle" class="dg-sub">local replanning</text>
 
-            <rect x="455" y="15"  width="105" height="40" rx="6" class="dg-node-a" />
-            <text x="507" y="32"  text-anchor="middle" class="dg-label">Geofence</text>
-            <text x="507" y="45"  text-anchor="middle" class="dg-sub">veto</text>
+            <rect x="425" y="15"  width="100" height="46" rx="6" class="dg-node-a" />
+            <text x="475" y="35"  text-anchor="middle" class="dg-label">Reactive</text>
+            <text x="475" y="49"  text-anchor="middle" class="dg-sub">avoidance · actions</text>
 
-            <rect x="600" y="120" width="90"  height="46" rx="6" class="dg-node" />
-            <text x="645" y="140" text-anchor="middle" class="dg-label">Go2 base</text>
-            <text x="645" y="154" text-anchor="middle" class="dg-sub">gait ctrl</text>
+            <rect x="560" y="85"  width="130" height="40" rx="6" class="dg-node" />
+            <text x="625" y="102" text-anchor="middle" class="dg-label">Go2 · B2 · B2W</text>
+            <text x="625" y="115" text-anchor="middle" class="dg-sub">real robot</text>
 
-            <path d="M 115 143 H 152"                    class="dg-edge" marker-end="url(#arrow)" />
-            <path d="M 260 137 Q 280 137 280 78 H 297"   class="dg-edge" marker-end="url(#arrow)" />
-            <path d="M 260 150 Q 280 150 280 208 H 297"  class="dg-edge" marker-end="url(#arrow)" />
-            <path d="M 415 78  Q 440 78 440 137 H 452"   class="dg-edge" marker-end="url(#arrow)" />
-            <path d="M 415 208 Q 440 208 440 150 H 452"  class="dg-edge" marker-end="url(#arrow)" />
-            <path d="M 507 120 V 58"                     class="dg-edge" marker-end="url(#arrow)" />
-            <path d="M 560 143 H 597"                    class="dg-edge" marker-end="url(#arrow)" />
-            <path d="M 645 166 V 265 H 62 V 168"         class="dg-edge" marker-end="url(#arrow)" />
+            <rect x="560" y="160" width="130" height="40" rx="6" class="dg-node-a" />
+            <text x="625" y="177" text-anchor="middle" class="dg-label">Gazebo + bridge</text>
+            <text x="625" y="190" text-anchor="middle" class="dg-sub">same Unitree topics</text>
 
-            <text x="133" y="137" text-anchor="middle" class="dg-topic">/scan</text>
-            <text x="353" y="277" text-anchor="middle" class="dg-topic">odometry + new observations close the loop</text>
+            <path d="M 110 143 H 137"                    class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 240 137 Q 258 137 258 63 H 272"   class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 240 150 Q 258 150 258 223 H 272"  class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 390 63  Q 408 63 408 137 H 422"   class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 390 223 Q 408 223 408 150 H 422"  class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 475 61 V 117"                     class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 525 137 Q 542 137 542 105 H 557"  class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 525 150 Q 542 150 542 180 H 557"  class="dg-edge" marker-end="url(#arrow)" />
+            <path d="M 625 200 V 280 H 60 V 168"         class="dg-edge" marker-end="url(#arrow)" />
+
+            <text x="490" y="92"  text-anchor="start"  class="dg-topic">obstacles</text>
+            <text x="342" y="293" text-anchor="middle" class="dg-topic">odometry + new observations close the loop</text>
           </svg>
         </div>
         <p class="media-cap">Teal blocks are the parts I wrote; the rest is ROS 2 infrastructure wired to them.</p>
 
         <h2>The challenges</h2>
+
+        <h3>Choosing where to go next</h3>
+        <p>
+          Exploration is a ROS 2 service: ask it for a goal, get the best frontier back. Frontier cells are
+          found with an 8-neighbour test on the occupancy grid — free cells touching unknown space — then
+          grouped with KD-tree clustering so one ragged doorway edge becomes one candidate rather than
+          forty. Each cluster is scored by its <strong>medoid</strong>, trading distance against size: a
+          large frontier nearby beats a sliver across the map. The medoid is always a real frontier cell,
+          so the goal never lands inside a wall the way a centroid of a curved frontier can.
+        </p>
 
         <h3>Goals the robot can see but cannot reach</h3>
         <p>
@@ -168,33 +211,20 @@
           re-planning, nudging — forever. The mission never advances and the map never completes.
         </p>
         <p>
-          The original recovery only triggered while the obstacle-avoidance layer had paused the robot.
-          That covered the obvious case and missed the common one: stuck against a wall <em>during a final
-          orientation spin</em>, where avoidance never fires because nothing is in front. Those control
-          loops had no exit condition.
-        </p>
-        <p>
           The fix made the timeout a property of the motion rather than of the avoidance state. Every
           waypoint-following and orientation loop enforces its own deadline, set to a multiple of expected
-          travel time. On expiry the goal is marked unreachable, the mission manager discards it, and the
-          explorer picks a fresh frontier — a few seconds lost instead of the whole run.
+          travel time. On expiry the goal is marked unreachable, discarded, and the explorer picks a fresh
+          frontier — a few seconds lost instead of the whole run.
         </p>
 
-        <h3>Extending an indoor stack outdoors</h3>
+        <h3>Obstacles the map didn't have</h3>
         <p>
-          Larger open spaces put frontiers further apart, so a bad choice costs more. Uneven ground starts
-          to break the flat-world assumption behind a 2D occupancy grid, which is why the OctoMap layer
-          matters — overhangs and low obstacles stay visible to the planner instead of flattening away.
-          GPS arrives as both a global reference and the geofence that makes outdoor autonomy permissible.
+          Reactive avoidance runs as ROS 2 actions on raw LiDAR, with two strategies: <strong>rotate, then
+          wall-follow</strong> for something blocking the path, and a <strong>lateral slide</strong> for
+          something that can be side-stepped. Dodging alone isn't enough — the global plan would just walk
+          the robot back into the same obstacle — so detected obstacles are injected live into the A*
+          planner, which replans locally around them.
         </p>
-
-        <h2>Results</h2>
-        <ul class="ticks">
-          <li>Full autonomous coverage of indoor spaces with no operator input and no prior map — the run terminates on its own when frontiers are exhausted.</li>
-          <li>Unreachable goals degraded from a mission-ending stall to a few seconds of lost time.</li>
-          <li>Stack extended from indoor-only to outdoor sites, with geofencing enforced independently of the planner.</li>
-          <li>Reactive avoidance handles moving obstacles rather than assuming a static map.</li>
-        </ul>
 
         <div class="proj-media">
           <video controls preload="none" playsinline muted poster="../assets/posters/go2-obstacle-avoidance.jpg">
@@ -204,14 +234,31 @@
         </div>
         <p class="media-cap">Reactive avoidance against a moving obstacle crossing the robot's path.</p>
 
+        <h3>A simulator the production stack can't tell apart</h3>
+        <p>
+          The Gazebo simulator covers Go2, A2, A2W, B2 and B2W. The important part is the bridge layer: it
+          mirrors the real Unitree topic interface, so <strong>the production stack runs unchanged</strong>
+          — no sim-only branches, no flags to forget before deployment. That is what makes it useful to
+          clients, who validate their missions in it before anything runs on hardware.
+        </p>
+
+        <h2>Results</h2>
+        <ul class="ticks">
+          <li>Autonomy code in production on a client fleet of about 45 Unitree quadrupeds.</li>
+          <li>A 7-minute exploration run covered 58 m across 8 frontier goals in simulation, with no operator input and no prior map.</li>
+          <li>Exploration, avoidance and mission planning supported on Go2, B2 and B2W; A2 and A2W support in progress.</li>
+          <li>Unreachable goals degraded from a mission-ending stall to a few seconds of lost time.</li>
+          <li>Clients validate missions in the simulator before hardware, against the same interface the robots expose.</li>
+        </ul>
+
         <h2>Outcome</h2>
         <p>
-          The SLAM and the planner were the solved parts — good open-source implementations exist for both.
-          The engineering that mattered was <strong>everything deciding what to do when those solved
-          problems return an answer that doesn't work</strong>: unreachable goals, frontiers that aren't
-          really frontiers, a robot technically making progress but practically stuck. A demo runs for two
-          minutes; an autonomous survey has to run for an hour unattended, and the gap between those two is
-          entirely a question of how many failure modes you have handled.
+          Mapping and path planning were the solved parts — good implementations exist for both. The
+          engineering that mattered was <strong>everything deciding what to do when those solved problems
+          return an answer that doesn't work</strong>: unreachable goals, frontiers that aren't really
+          frontiers, an obstacle the map never had. And because the robots are deployed far from where the
+          code is written, the simulator had to be faithful enough that passing in sim actually means
+          something on hardware.
         </p>
 
       </div>

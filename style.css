@@ -548,6 +548,19 @@ h1, h2, h3, h4 {
   pointer-events: none;
 }
 
+/* Two framed clips stacked in one card — each frame carries its own tag */
+.pcard-media.dual { gap: 2px; }
+.pcard-media.dual::before { display: none; }
+.media-frame {
+  position: relative;
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  background: var(--bg-deep);
+}
+.media-frame video { min-height: 160px; }
+.pcard-media.dual .pcard-tag { padding-top: 1.1rem; }
+
 /* ── PROJECT BODY ── */
 .pcard-body {
   padding: 2rem 2.25rem;
@@ -875,6 +888,24 @@ footer p { font-size: 0.78rem; color: rgba(255,255,255,0.55); }
   color: var(--text-mid);
   line-height: 1.7;
   margin: 0.55rem 0 0.9rem;
+}
+.tl-desc + .tl-points { margin-top: -0.4rem; }
+.tl-points {
+  list-style: none;
+  display: flex; flex-direction: column; gap: 0.45rem;
+  margin: 0 0 1rem;
+}
+.tl-points li {
+  position: relative;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+  color: var(--text-mid);
+  line-height: 1.65;
+}
+.tl-points li::before {
+  content: '▸';
+  position: absolute; left: 0; top: 0;
+  color: var(--accent);
 }
 
 /* ══════════════════════════════════════════════════

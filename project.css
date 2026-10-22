@@ -273,6 +273,19 @@
   margin-bottom: 2.5rem;
 }
 
+/* Two framed clips side by side, each with its own caption */
+.media-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 0.4rem;
+}
+.media-pair figure { margin: 0; }
+.media-pair .proj-media { aspect-ratio: 16 / 9; }
+.media-pair .proj-media video { height: 100%; object-fit: contain; }
+.media-pair .media-cap { margin-bottom: 1rem; }
+.media-pair .media-cap strong { color: var(--text); font-weight: 500; }
+
 /* ─── Architecture diagram ─────────────────────── */
 .diagram {
   border: 1px solid var(--border-md);
@@ -353,6 +366,7 @@
 }
 
 @media (max-width: 640px) {
+  .media-pair { grid-template-columns: 1fr; }
   .proj-nav { grid-template-columns: 1fr; }
   .pnav-card.next { text-align: left; }
   .spec-row { border-right: none; }
